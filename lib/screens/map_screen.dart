@@ -7,6 +7,7 @@ import 'package:shca_test/screens/map_search_screen.dart';
 import 'package:shca_test/screens/summary_screen.dart';
 import 'package:shca_test/components/google_maps.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'package:share_plus/share_plus.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({Key? key}) : super(key: key);
@@ -16,8 +17,6 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  double _magnitude = 0.0;
-  double _speed = 0.0;
   double _lastX = 0.0;
   double _lastY = 0.0;
   double _lastZ = 0.0;
@@ -26,15 +25,21 @@ class _MapScreenState extends State<MapScreen> {
   StreamSubscription<GyroscopeEvent>? _subscriptionGyro;
   StreamSubscription<UserAccelerometerEvent>? _subscriptionAcc;
 
+  Future<void> share() async {
+    await Share.share(
+      'https://www.google.com/maps/search/?api=1&query=1.3521,103.8198',
+      subject: 'Live Location',
+      sharePositionOrigin: const Rect.fromLTWH(0, 0, 0, 0),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     _subscriptionGyro = Stream.periodic(const Duration(seconds: 1))
         .asyncMap((_) => gyroscopeEvents.first)
         .listen((event) {
-      setState(() {
-        _magnitude = -event.z * 180 / pi;
-      });
+      setState(() {});
     });
     _subscriptionAcc = Stream.periodic(const Duration(milliseconds: 500))
         .asyncMap((_) => userAccelerometerEvents.first)
@@ -57,7 +62,6 @@ class _MapScreenState extends State<MapScreen> {
       // get speed
       _currentTime = DateTime.now().millisecondsSinceEpoch / 1000;
       double dt = _currentTime - _lastTime;
-      _speed = acceleration * dt * 1000;
 
       setState(() {
         _lastX = x;
@@ -106,21 +110,13 @@ class _MapScreenState extends State<MapScreen> {
             ),
             const SizedBox(width: 16.0),
             ElevatedButton(
-              // width is less
-              style: ElevatedButton.styleFrom(
-                fixedSize: const Size(100, 30),
-              ),
-              child: const Text('Share Live Location',
-                  style: TextStyle(fontSize: 14.0)),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const FamilyOptionScreen(),
-                  ),
-                );
-              },
-            ),
+                // width is less
+                style: ElevatedButton.styleFrom(
+                  fixedSize: const Size(100, 30),
+                ),
+                onPressed: share,
+                child: const Text('Share Live Location',
+                    style: TextStyle(fontSize: 14.0))),
           ],
         ),
         actions: [
@@ -162,7 +158,8 @@ class _MapScreenState extends State<MapScreen> {
             Container(
               color: Colors.grey[300],
               width: double.infinity,
-              height: MediaQuery.of(context).size.width > 600 ? 400 : 200,
+              // auto
+              height: MediaQuery.of(context).size.width * 0.8,
               child: const Center(child: MapSample()),
             ),
             const SizedBox(height: 16.0),
@@ -170,22 +167,11 @@ class _MapScreenState extends State<MapScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildDetailBox(context, 'Alcohol Level', '0.05'),
-                _buildDetailBox(
-                    context, 'Speed', '${_speed.toStringAsFixed(2)} m/s'),
-                _buildDetailBox(context, 'Rotation',
-                    '${_magnitude.toStringAsFixed(2)} °/s'),
-              ],
-            ),
-            const SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
                 _buildDetailBox(context, 'Ignition', 'On'),
                 _buildDetailBox(context, 'Helmet', 'Correct'),
                 _buildDetailBox(context, 'IoT', 'Connected'),
               ],
             ),
-            const SizedBox(height: 16.0),
           ],
         ),
       ),
@@ -194,7 +180,7 @@ class _MapScreenState extends State<MapScreen> {
 
   Widget _buildDetailBox(BuildContext context, String title, String value) {
     return Container(
-      width: MediaQuery.of(context).size.width / 3.5,
+      width: MediaQuery.of(context).size.width / 4.5,
       height: MediaQuery.of(context).size.width / 3.5 * 1.5,
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
       decoration: BoxDecoration(
