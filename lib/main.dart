@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:shca_test/scanner_widget.dart';
 import 'package:shca_test/screens/username_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shca_test/models/contacts_model.dart';
