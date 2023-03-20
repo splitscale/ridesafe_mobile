@@ -1,4 +1,4 @@
-package com.example.ridesafe_mobile
+package com.example.shca_test
 
 import io.flutter.embedding.android.FlutterActivity
 

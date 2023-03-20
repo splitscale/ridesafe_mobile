@@ -1,6 +1,6 @@
 {
-    "name": "ridesafe_mobile",
-    "short_name": "ridesafe_mobile",
+    "name": "shca_test",
+    "short_name": "shca_test",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
