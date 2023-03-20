@@ -78,7 +78,7 @@ class EditEmergencyContactScreenState
                 phoneNumber = value;
               },
               keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Enter phone number',
                 border: OutlineInputBorder(),
               ),
@@ -95,13 +95,13 @@ class EditEmergencyContactScreenState
                     final newContact = Contact(name, phoneNumber);
                     await contactBox.add(newContact);
                   } else {
-                    widget.contact!.name = name;
-                    widget.contact!.phone = phoneNumber;
-                    await contactBox.put(widget.contact!.key, widget.contact!);
+                    widget.contact.name = name;
+                    widget.contact.phone = phoneNumber;
+                    await contactBox.put(widget.contact.key, widget.contact);
                   }
                   Navigator.pop(context);
                 },
-                child: Text(widget.contact == null ? 'Add' : 'Save'),
+                child: const Text('Save'),
               ),
             ),
           ],
