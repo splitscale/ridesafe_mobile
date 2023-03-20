@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:shca_test/screens/family_share_screen.dart';
 import 'package:shca_test/screens/map_screen.dart';
+import 'package:shca_test/providers/username_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum UserType { driver, family }
-
-class UsernameScreen extends StatefulWidget {
-  const UsernameScreen({Key? key}) : super(key: key);
-
-  @override
-  State<UsernameScreen> createState() => UsernameScreenState();
-}
-
-class UsernameScreenState extends State<UsernameScreen> {
-  final _usernameController = TextEditingController();
-  UserType? _userType = UserType.driver;
+class UsernameScreen extends ConsumerWidget {
+  const UsernameScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    var userDetails = ref.watch(userDetailsProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('RideSafe'),
@@ -34,7 +27,10 @@ class UsernameScreenState extends State<UsernameScreen> {
             SizedBox(
               width: 250,
               child: TextField(
-                controller: _usernameController,
+                onChanged: (value) {
+                  ref.read(userDetailsProvider.notifier).state = UserDetails(
+                      username: value, userType: userDetails.userType);
+                },
                 decoration: const InputDecoration(
                   hintText: 'Username',
                 ),
@@ -50,21 +46,22 @@ class UsernameScreenState extends State<UsernameScreen> {
               children: <Widget>[
                 Radio<UserType>(
                     value: UserType.driver,
-                    groupValue: _userType,
+                    groupValue: ref.watch(userDetailsProvider).userType,
                     onChanged: (value) {
-                      setState(() {
-                        _userType = value;
-                      });
+                      ref.read(userDetailsProvider.notifier).state =
+                          UserDetails(
+                              username: ref.watch(userDetailsProvider).username,
+                              userType: value!);
                     }),
                 const Text('Driver'),
                 const SizedBox(width: 32),
                 Radio<UserType>(
                   value: UserType.family,
-                  groupValue: _userType,
+                  groupValue: ref.watch(userDetailsProvider).userType,
                   onChanged: (value) {
-                    setState(() {
-                      _userType = value;
-                    });
+                    ref.read(userDetailsProvider.notifier).state = UserDetails(
+                        username: ref.watch(userDetailsProvider).username,
+                        userType: value!);
                   },
                 ),
                 const Text('Family'),
@@ -79,9 +76,11 @@ class UsernameScreenState extends State<UsernameScreen> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => _userType == UserType.driver
-                              ? const MapScreen()
-                              : const FamilyOptionScreen()));
+                          builder: (context) =>
+                              ref.watch(userDetailsProvider).userType ==
+                                      UserType.driver
+                                  ? const MapScreen()
+                                  : const FamilyOptionScreen()));
                 },
               ),
             ),

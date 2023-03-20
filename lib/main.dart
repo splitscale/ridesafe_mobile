@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:shca_test/screens/username_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shca_test/models/contacts_model.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(ContactAdapter());
   await Hive.openBox<Contact>('contacts');
 
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

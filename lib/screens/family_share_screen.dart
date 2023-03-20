@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shca_test/screens/family_map_view_screen.dart';
+import 'package:shca_test/providers/username_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class FamilyOptionScreen extends StatelessWidget {
+class FamilyOptionScreen extends ConsumerWidget {
   const FamilyOptionScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
