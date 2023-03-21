@@ -48,6 +48,10 @@ dependencies:
   riverpod_annotation: ^2.0.2
   flutter_riverpod: ^2.3.2
 
+  # The following adds the ridesafe api
+  ridesafe_api:
+    git: https://github.com/splitscale/ridesafe_api.git
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
