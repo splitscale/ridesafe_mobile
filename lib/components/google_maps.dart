@@ -3,30 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
-Future<Position> determinPosition() async {
-  bool serviceEnabled;
-  LocationPermission permission;
-
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    return Future.error('Location services are disabled.');
-  }
-
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      return Future.error('Location permissions are denied');
-    }
-  }
-
-  if (permission == LocationPermission.deniedForever) {
-    return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.');
-  }
-  return await Geolocator.getCurrentPosition();
-}
-
 class MapSample extends StatefulWidget {
   const MapSample({Key? key}) : super(key: key);
 
@@ -40,17 +16,47 @@ class MapSampleState extends State<MapSample> {
 
   LatLng? _center;
 
+  StreamSubscription<Position>? _positionStreamSubscription;
+
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
   }
 
-  void _getCurrentLocation() async {
-    final position = await determinPosition();
+  @override
+  void dispose() {
+    super.dispose();
+    _positionStreamSubscription?.cancel();
+  }
 
-    setState(() {
-      _center = LatLng(position.latitude, position.longitude);
+  void _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    _positionStreamSubscription =
+        Geolocator.getPositionStream().listen((Position position) {
+      setState(() {
+        _center = LatLng(position.latitude, position.longitude);
+      });
     });
   }
 
@@ -66,7 +72,7 @@ class MapSampleState extends State<MapSample> {
             },
             markers: {
               Marker(
-                markerId: const MarkerId('lake'),
+                markerId: const MarkerId('currentLocation'),
                 position: _center!,
                 infoWindow: const InfoWindow(title: 'You are here'),
               ),
