@@ -51,6 +51,7 @@ dependencies:
   # The following adds the ridesafe api
   ridesafe_api:
     git: https://github.com/splitscale/ridesafe_api.git
+  flutter_slidable: ^2.0.0
 
 dev_dependencies:
   flutter_test:

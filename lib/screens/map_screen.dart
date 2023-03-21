@@ -22,6 +22,8 @@ class _MapScreenState extends State<MapScreen> {
   double _lastZ = 0.0;
   double _currentTime = 0.0;
   double _lastTime = 0.0;
+  double _sheetTop = 500.0; // initial position of the bottom sheet
+  bool _showBottomSheet = false; // flag to show/hide the bottom sheet
   StreamSubscription<GyroscopeEvent>? _subscriptionGyro;
   StreamSubscription<UserAccelerometerEvent>? _subscriptionAcc;
 
@@ -159,6 +161,14 @@ class _MapScreenState extends State<MapScreen> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _showBottomSheet = !_showBottomSheet;
+          });
+        },
+        child: Icon(Icons.add),
       ),
     );
   }
