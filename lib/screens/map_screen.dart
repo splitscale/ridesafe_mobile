@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shca_test/screens/emergency_contacts_screen.dart';
-import 'package:shca_test/screens/family_share_screen.dart';
 import 'package:shca_test/screens/map_search_screen.dart';
 import 'package:shca_test/screens/summary_screen.dart';
 import 'package:shca_test/components/google_maps.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shca_test/components/share_location_button.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({Key? key}) : super(key: key);
@@ -24,14 +24,6 @@ class _MapScreenState extends State<MapScreen> {
   double _lastTime = 0.0;
   StreamSubscription<GyroscopeEvent>? _subscriptionGyro;
   StreamSubscription<UserAccelerometerEvent>? _subscriptionAcc;
-
-  Future<void> share() async {
-    await Share.share(
-      'https://www.google.com/maps/search/?api=1&query=1.3521,103.8198',
-      subject: 'Live Location',
-      sharePositionOrigin: const Rect.fromLTWH(0, 0, 0, 0),
-    );
-  }
 
   @override
   void initState() {
@@ -109,14 +101,7 @@ class _MapScreenState extends State<MapScreen> {
               },
             ),
             const SizedBox(width: 16.0),
-            ElevatedButton(
-                // width is less
-                style: ElevatedButton.styleFrom(
-                  fixedSize: const Size(100, 30),
-                ),
-                onPressed: share,
-                child: const Text('Share Live Location',
-                    style: TextStyle(fontSize: 14.0))),
+            const ShareLiveLocationButton()
           ],
         ),
         actions: [
@@ -207,7 +192,7 @@ class _MapScreenState extends State<MapScreen> {
           Text(
             value,
             style: const TextStyle(
-              fontSize: 24.0,
+              fontSize: 12.0,
               fontWeight: FontWeight.bold,
             ),
           ),
