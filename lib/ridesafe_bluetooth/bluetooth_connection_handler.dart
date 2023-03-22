@@ -55,11 +55,13 @@ class BluetoothConnectionHandler {
         await _permissionService.request();
       }
 
-      if (isGranted) {
+      if (isDenied) {
         await _bluetoothService.openInternalSettings();
       }
 
-      _logStep('BluetoothPermission granted');
+      if (isGranted) {
+        _logStep('BluetoothPermission granted');
+      }
     } catch (e) {
       _logErr('[assertBluetoothPermissionErr]: ${e.toString()}');
     }
@@ -197,8 +199,10 @@ class BluetoothConnectionHandler {
 // throw exception
   Future<ConnectedDevice<BluetoothConnection>> pairDevice(Device device) async {
     try {
-      _logStep('pairing to: ${device.name}');
-      await _bluetoothService.pair(device, _targetDevicePin);
+      if (!device.isPaired) {
+        _logStep('pairing to: ${device.name}');
+        await _bluetoothService.pair(device, _targetDevicePin);
+      }
 
       return (await connectToPairedDevice(device));
     } catch (e) {

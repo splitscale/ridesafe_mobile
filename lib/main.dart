@@ -1,19 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:shca_test/screens/username_screen.dart';
+import 'package:ridesafe_api/api_endpoints.dart';
+import 'package:ridesafe_api/ridesafe_api.dart';
+import 'package:shca_test/screens/terminal/terminal_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shca_test/models/contacts_model.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'dependencies/flutter_dependency_initializer.dart';
+
 void main() async {
+  final dependencyInitializer = FlutterDependencyInitializer<Ridesafe>(
+    [
+      () async => ApiEndpoints(),
+    ],
+    () async => Ridesafe(ApiEndpoints()),
+  );
+
+  final Ridesafe ridesafe = await dependencyInitializer.initialize();
+
   await Hive.initFlutter();
   Hive.registerAdapter(ContactAdapter());
   await Hive.openBox<Contact>('contacts');
 
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(ProviderScope(
+      child: MyApp(
+    ridesafe: ridesafe,
+  )));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Ridesafe _ridesafe;
+
+  const MyApp({Key? key, required Ridesafe ridesafe})
+      : _ridesafe = ridesafe,
+        super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -24,7 +44,8 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const UsernameScreen(),
+      // home: const UsernameScreen(),
+      home: TerminalScreen(ridesafe: _ridesafe),
     );
   }
 }
