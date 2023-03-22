@@ -163,13 +163,37 @@ class _MapScreenState extends State<MapScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            _showBottomSheet = !_showBottomSheet;
-          });
-        },
-        child: Icon(Icons.add),
-      ),
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return Container(
+                  height: 200.0,
+                  color: Colors.white,
+                  child: Center(
+                    child: ElevatedButton(
+                        onPressed: () {
+                          // Handle emergency button press
+                        },
+                        child: Text(
+                          'Press for Emergency',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        // circular, red button
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            shape: CircleBorder(),
+                            padding: EdgeInsets.all(75))),
+                  ),
+                );
+              },
+            );
+          },
+          child: Icon(Icons.emergency),
+          backgroundColor: Colors.redAccent),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
