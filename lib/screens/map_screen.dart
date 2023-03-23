@@ -8,6 +8,7 @@ import 'package:shca_test/components/google_maps.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shca_test/components/share_location_button.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({Key? key}) : super(key: key);
@@ -71,6 +72,14 @@ class _MapScreenState extends State<MapScreen> {
     _subscriptionGyro?.cancel();
     _subscriptionAcc?.cancel();
     super.dispose();
+  }
+
+  void _sendSMS(String message, List<String> recipents) async {
+    String _result = await sendSMS(message: message, recipients: recipents)
+        .catchError((onError) {
+      print(onError);
+    });
+    print(_result);
   }
 
   @override
@@ -173,7 +182,7 @@ class _MapScreenState extends State<MapScreen> {
                   child: Center(
                     child: ElevatedButton(
                         onPressed: () {
-                          // Handle emergency button press
+                          _sendSMS("Sample Text", ["639493552425"]);
                         },
                         child: Text(
                           'Press for Emergency',
