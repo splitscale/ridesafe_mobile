@@ -9,6 +9,8 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shca_test/components/share_location_button.dart';
 import 'package:flutter_sms/flutter_sms.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:shca_test/models/contacts_model.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({Key? key}) : super(key: key);
@@ -181,8 +183,13 @@ class _MapScreenState extends State<MapScreen> {
                   color: Colors.white,
                   child: Center(
                     child: ElevatedButton(
-                        onPressed: () {
-                          _sendSMS("Sample Text", ["639493552425"]);
+                        onPressed: () async {
+                          final contactsBox = Hive.box<Contact>('contacts');
+                          final phoneNumbers = contactsBox.values
+                              .map((contact) => contact.phone.toString())
+                              .toList();
+                          _sendSMS(
+                              "Help me, I'm in an emergency!", phoneNumbers);
                         },
                         child: Text(
                           'Press for Emergency',
