@@ -53,6 +53,7 @@ dependencies:
 
   ridesafe_core:
     git: https://github.com/splitscale/ridesafe_core.git
+  firebase_core: ^2.8.0
 
 dev_dependencies:
   flutter_test:

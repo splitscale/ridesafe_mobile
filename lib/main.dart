@@ -6,6 +6,8 @@ import 'package:shca_test/screens/username_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shca_test/models/contacts_model.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 import 'dependencies/flutter_dependency_initializer.dart';
 
@@ -19,6 +21,9 @@ void main() async {
 
   final Ridesafe ridesafe = await dependencyInitializer.initialize();
 
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await Hive.initFlutter();
   Hive.registerAdapter(ContactAdapter());
   await Hive.openBox<Contact>('contacts');
