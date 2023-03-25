@@ -1,16 +1,71 @@
-import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shca_test/screens/emergency_contacts_screen.dart';
 import 'package:shca_test/screens/map_search_screen.dart';
 import 'package:shca_test/screens/summary_screen.dart';
 import 'package:shca_test/components/google_maps.dart';
-import 'package:sensors_plus/sensors_plus.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:shca_test/components/share_location_button.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shca_test/models/contacts_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shca_test/providers/json_provider.dart';
+
+class DetailCards extends ConsumerWidget {
+  final String title;
+
+  const DetailCards({Key? key, required this.title}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    var mockData = ref.watch(mockDataProvider);
+    late String value;
+    // Alcoho Level, Ignition, Helmet, IoT
+    if (title == 'Alcohol Level') {
+      value = mockData['helmet']['alcohol_level'].toString();
+    } else if (title == 'Ignition') {
+      value = mockData['motor']['is_ignition_ready'].toString();
+    } else if (title == 'Helmet') {
+      value = mockData['helmet']['is_worn'].toString();
+    } else if (title == 'IoT') {
+      value = mockData['gps']['latitude'].toString();
+    }
+    return Container(
+      width: MediaQuery.of(context).size.width / 4.5,
+      height: MediaQuery.of(context).size.width / 3.5 * 1.5,
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 12.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class MapScreen extends StatefulWidget {
   const MapScreen({Key? key}) : super(key: key);
@@ -27,52 +82,14 @@ class _MapScreenState extends State<MapScreen> {
   double _lastTime = 0.0;
   double _sheetTop = 500.0; // initial position of the bottom sheet
   bool _showBottomSheet = false; // flag to show/hide the bottom sheet
-  StreamSubscription<GyroscopeEvent>? _subscriptionGyro;
-  StreamSubscription<UserAccelerometerEvent>? _subscriptionAcc;
 
   @override
   void initState() {
     super.initState();
-    _subscriptionGyro = Stream.periodic(const Duration(seconds: 1))
-        .asyncMap((_) => gyroscopeEvents.first)
-        .listen((event) {
-      setState(() {});
-    });
-    _subscriptionAcc = Stream.periodic(const Duration(milliseconds: 500))
-        .asyncMap((_) => userAccelerometerEvents.first)
-        .listen((event) {
-      double x = event.x;
-      double y = event.y;
-      double z = event.z;
-
-      // Calculate acceleration in three dimensions
-      double acceleration = (pow(x, 2) +
-              pow(y, 2) +
-              pow(z, 2) -
-              pow(_lastX, 2) -
-              pow(_lastY, 2) -
-              pow(_lastZ, 2))
-          .toDouble();
-
-      acceleration = acceleration.abs();
-
-      // get speed
-      _currentTime = DateTime.now().millisecondsSinceEpoch / 1000;
-      double dt = _currentTime - _lastTime;
-
-      setState(() {
-        _lastX = x;
-        _lastY = y;
-        _lastZ = z;
-        _lastTime = _currentTime;
-      });
-    });
   }
 
   @override
   void dispose() {
-    _subscriptionGyro?.cancel();
-    _subscriptionAcc?.cancel();
     super.dispose();
   }
 
@@ -164,10 +181,10 @@ class _MapScreenState extends State<MapScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildDetailBox(context, 'Alcohol Level', '0.05'),
-                _buildDetailBox(context, 'Ignition', 'On'),
-                _buildDetailBox(context, 'Helmet', 'Correct'),
-                _buildDetailBox(context, 'IoT', 'Connected'),
+                DetailCards(title: 'Alcohol Level'),
+                DetailCards(title: 'Ignition'),
+                DetailCards(title: 'Helmet'),
+                DetailCards(title: 'IoT'),
               ],
             ),
           ],
@@ -209,45 +226,8 @@ class _MapScreenState extends State<MapScreen> {
           },
           child: Icon(Icons.emergency),
           backgroundColor: Colors.redAccent),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
-  }
-
-  Widget _buildDetailBox(BuildContext context, String title, String value) {
-    return Container(
-      width: MediaQuery.of(context).size.width / 4.5,
-      height: MediaQuery.of(context).size.width / 3.5 * 1.5,
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 12.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.miniCenterFloat,
     );
   }
 }
