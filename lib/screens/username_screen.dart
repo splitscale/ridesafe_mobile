@@ -1,69 +1,22 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:shca_test/providers/username_provider.dart';
-import 'package:shca_test/components/add_user_button.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shca_test/screens/map_screen.dart';
 
-final bluetoothProvider = ChangeNotifierProvider<BluetoothController>((ref) {
-  final controller = BluetoothController();
-  controller.getBondedDevices();
-  return controller;
-});
-
-class BluetoothController extends ChangeNotifier {
-  List<BluetoothDevice> _devices = [];
-  late BluetoothDevice _selectedDevice;
-  late BluetoothConnection _connection;
-  String _receivedData = '';
-
-  List<BluetoothDevice> get devices => _devices;
-  BluetoothDevice get selectedDevice => _selectedDevice;
-  BluetoothConnection get connection => _connection;
-  String get receivedData => _receivedData;
-
-  Future<void> getBondedDevices() async {
-    _devices = await FlutterBluetoothSerial.instance.getBondedDevices();
-    notifyListeners();
-  }
-
-  Future<void> connectToDevice() async {
-    try {
-      _connection =
-          await BluetoothConnection.toAddress(_selectedDevice.address!);
-      _connection.input?.listen(_onDataReceived).onDone(() {
-        notifyListeners();
-      });
-    } catch (error) {
-      print('ERROR: $error');
-    }
-    notifyListeners();
-  }
-
-  void _onDataReceived(Uint8List data) {
-    _receivedData += utf8.decode(data);
-    notifyListeners();
-  }
-
-  void disconnect() {
-    _connection.dispose();
-    notifyListeners();
-  }
-
-  void setSelectedDevice(BluetoothDevice device) {
-    _selectedDevice = device;
-    notifyListeners();
-  }
-}
+import 'package:shca_test/providers/username_provider.dart';
+import 'package:shca_test/providers/json_provider.dart';
 
 class UsernameScreen extends ConsumerWidget {
-  const UsernameScreen({Key? key});
+  const UsernameScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final controller = ref.watch(bluetoothProvider);
     var userDetails = ref.watch(userDetailsProvider);
+    var mockData = ref.watch(mockDataProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('RideSafe'),
@@ -121,55 +74,68 @@ class UsernameScreen extends ConsumerWidget {
                 const Text('Family'),
               ],
             ),
-            ElevatedButton(
-              child: Text('Select Device'),
-              onPressed: () async {
-                List<BluetoothDevice> devices = controller.devices;
-                BluetoothDevice? selected = await showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Select Bluetooth Device'),
-                      content: SingleChildScrollView(
-                        child: ListBody(
-                          children: devices
-                              .map((device) => ListTile(
-                                    title: Text(device.name.toString()),
-                                    subtitle: Text(device.address),
-                                    onTap: () {
-                                      controller.setSelectedDevice(device);
-                                      Navigator.of(context).pop(device);
-                                    },
-                                  ))
-                              .toList(),
-                        ),
-                      ),
-                    );
-                  },
-                );
-                if (selected != null) {
-                  controller.setSelectedDevice(selected);
-                }
-              },
-            ),
-            ElevatedButton(
-              child: Text('Connect'),
-              onPressed: () {
-                controller.connectToDevice();
-              },
-            ),
-            ElevatedButton(
-              child: Text('Disconnect'),
-              onPressed: () {
-                controller.disconnect();
-              },
-            ),
-            Text(controller.receivedData),
             Expanded(child: Container()),
-            AddUser(
-              username: ref.watch(userDetailsProvider).username,
-              userType: ref.watch(userDetailsProvider).userType,
+            ElevatedButton(
+              onPressed: () {
+                Timer.periodic(const Duration(seconds: 1), (timer) {
+                  var data = {
+                    "gps": {
+                      "latitude": 34.2342 + Random().nextInt(10),
+                      "longitude": 23.893345 + Random().nextInt(10),
+                      "speed": 25 + Random().nextInt(10),
+                      "time": {
+                        "hour": 1,
+                        "minute": 1,
+                        "second": 1 + Random().nextInt(10),
+                      },
+                      "date": {
+                        "month": 1,
+                        "day": 1 + Random().nextInt(10),
+                        "year": 2023,
+                      },
+                    },
+                    "helmet": {
+                      "is_worn": Random().nextInt(10) % 2 == 0,
+                      "alcohol_level": 256 - Random().nextInt(10),
+                    },
+                    "motor": {
+                      "is_ignition_ready": Random().nextInt(10) % 2 == 0,
+                    },
+                    "debug": {
+                      "message": "debug messages",
+                      "source": "from receiver",
+                      "info": "info here",
+                    },
+                  };
+                  ref.read(mockDataProvider.notifier).state = data;
+                });
+              },
+              child: const Text('Connect'),
             ),
+            ElevatedButton(
+              onPressed: () {
+                // stop the stream
+
+                ref.read(mockDataProvider.notifier).state = {};
+              },
+              child: const Text('Disconnect'),
+            ),
+            Expanded(child: Container()),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(userDetailsProvider.notifier).state = UserDetails(
+                    username: ref.watch(userDetailsProvider).username,
+                    userType: ref.watch(userDetailsProvider).userType);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MapScreen(),
+                  ),
+                );
+              },
+              child: const Text('Add User'),
+            ),
+            Expanded(child: Container()),
           ],
         ),
       ),

@@ -181,11 +181,10 @@ class BluetoothConnectionHandler {
 // throw exception
   Future<ConnectedDevice<BluetoothConnection>> connectToPairedDevice(
       Device device) async {
+    _logStep('connecting to paired device: ${device.name}');
     try {
       final connectedDevice = await _bluetoothService.connect(device);
-
-      _logStep('connecting to paired device: ${connectedDevice.name}');
-
+      _logStep('connected to device: ${connectedDevice.name}');
       return connectedDevice;
     } catch (e) {
       _logErr(e.toString());
