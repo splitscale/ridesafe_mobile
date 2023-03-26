@@ -154,21 +154,21 @@ class _MapScreenState extends State<MapScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MapSearchScreen(),
-                    ),
-                  );
-                },
-                decoration: const InputDecoration(
-                  hintText: 'Search',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
-                ),
-              ),
+              // child: TextField(
+              //   onTap: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => MapSearchScreen(),
+              //       ),
+              //     );
+              //   },
+              //   decoration: const InputDecoration(
+              //     hintText: 'Search',
+              //     prefixIcon: Icon(Icons.search),
+              //     border: OutlineInputBorder(),
+              //   ),
+              // ),
             ),
             Container(
               color: Colors.grey[300],
@@ -226,8 +226,7 @@ class _MapScreenState extends State<MapScreen> {
           },
           child: Icon(Icons.emergency),
           backgroundColor: Colors.redAccent),
-      floatingActionButtonLocation:
-          FloatingActionButtonLocation.miniCenterFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
