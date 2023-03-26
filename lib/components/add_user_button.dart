@@ -82,12 +82,6 @@ class AddUser extends ConsumerWidget {
           ref.read(userDetailsProvider.notifier).state = UserDetails(
               username: ref.watch(userDetailsProvider).username,
               userType: ref.watch(userDetailsProvider).userType);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MapScreen(),
-            ),
-          );
           addUser();
           Navigator.push(
               context,
