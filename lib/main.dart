@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       // home: TerminalScreen(ridesafe: _ridesafe),
-      home: RideSafeLandingScreen(),
+      home: const RideSafeLandingScreen(),
     );
   }
 }

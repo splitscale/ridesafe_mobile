@@ -13,8 +13,8 @@ class RideSafeLandingScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF2c3e50),
-              Color(0xFF34495e),
+              Color.fromARGB(255, 2, 56, 110),
+              Color.fromARGB(220, 2, 56, 110)
             ],
           ),
         ),
@@ -30,7 +30,7 @@ class RideSafeLandingScreen extends StatelessWidget {
               ),
               const SizedBox(height: 30.0),
               const Text(
-                'RideSafe',
+                'Selection',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 40.0,
@@ -39,7 +39,7 @@ class RideSafeLandingScreen extends StatelessWidget {
               ),
               SizedBox(height: 10.0),
               const Text(
-                'Your ultimate ride-sharing solution',
+                'Your Smart Helmet Companion',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20.0,
