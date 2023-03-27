@@ -17,6 +17,7 @@ class EmergencyContactsScreen extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
+        backgroundColor: const Color.fromARGB(255, 2, 56, 110),
         title: const Text('Emergency Contacts'),
       ),
       body: Column(
@@ -222,16 +223,17 @@ class EmergencyContactsScreen extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AddEmergencyContactScreen(),
-            ),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
+          backgroundColor: const Color.fromARGB(255, 2, 56, 110),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AddEmergencyContactScreen(),
+              ),
+            );
+          },
+          // contacts icon document
+          child: const Icon(Icons.add)),
     );
   }
 }

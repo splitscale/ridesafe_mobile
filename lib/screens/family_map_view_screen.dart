@@ -11,6 +11,7 @@ class FamilyMapViewScreen extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
+        backgroundColor: const Color.fromARGB(255, 2, 56, 110),
         title: Text('Family Map'),
       ),
       body: Column(

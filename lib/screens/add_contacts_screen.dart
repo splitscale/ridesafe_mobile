@@ -20,6 +20,7 @@ class AddEmergencyContactScreen extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
+        backgroundColor: const Color.fromARGB(255, 2, 56, 110),
         title: const Text('Add Emergency Contact'),
       ),
       body: Padding(
@@ -68,6 +69,9 @@ class AddEmergencyContactScreen extends StatelessWidget {
               width: double.infinity,
               height: 50.0,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 2, 56, 110),
+                ),
                 onPressed: () async {
                   final contactBox = await Hive.openBox<Contact>('contacts');
                   final newContact = Contact(name, phoneNumber);

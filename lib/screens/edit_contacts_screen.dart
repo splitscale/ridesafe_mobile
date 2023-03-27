@@ -37,6 +37,7 @@ class EditEmergencyContactScreenState
             Navigator.pop(context);
           },
         ),
+        backgroundColor: const Color.fromARGB(255, 2, 56, 110),
         title: Text(widget.contact == null
             ? 'Add Emergency Contact'
             : 'Edit Emergency Contact'),
@@ -89,6 +90,9 @@ class EditEmergencyContactScreenState
               width: double.infinity,
               height: 50.0,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 2, 56, 110),
+                ),
                 onPressed: () async {
                   final contactBox = await Hive.openBox<Contact>('contacts');
                   if (widget.contact == null) {

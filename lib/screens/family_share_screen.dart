@@ -16,6 +16,7 @@ class FamilyOptionScreen extends ConsumerWidget {
             Navigator.pop(context);
           },
         ),
+        backgroundColor: const Color.fromARGB(255, 2, 56, 110),
         title: const Text('Family Options'),
       ),
       body: Column(
@@ -44,6 +45,10 @@ class FamilyOptionScreen extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    fixedSize: const Size(200, 50),
+                    backgroundColor: const Color.fromARGB(255, 2, 56, 110),
+                  ),
                   onPressed: () {
                     Navigator.push(
                       context,
