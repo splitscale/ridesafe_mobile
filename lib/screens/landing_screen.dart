@@ -30,7 +30,7 @@ class RideSafeLandingScreen extends StatelessWidget {
               ),
               const SizedBox(height: 30.0),
               const Text(
-                'Ride Safe',
+                'RideSafe',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 40.0,
