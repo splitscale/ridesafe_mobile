@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shca_test/screens/emergency_contacts_screen.dart';
 import 'package:shca_test/screens/map_search_screen.dart';
+import 'package:shca_test/components/motor_container.dart';
 import 'package:shca_test/screens/summary_screen.dart';
 import 'package:shca_test/components/google_maps.dart';
 import 'package:shca_test/components/share_location_button.dart';
@@ -9,6 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shca_test/models/contacts_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shca_test/providers/json_provider.dart';
+import 'package:geolocator/geolocator.dart';
 
 class DetailCards extends ConsumerWidget {
   final String title;
@@ -18,16 +20,22 @@ class DetailCards extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var mockData = ref.watch(mockDataProvider);
-    late String value;
+    late String? value;
     // Alcoho Level, Ignition, Helmet, IoT
-    if (title == 'Alcohol Level') {
-      value = mockData['helmet']['alcohol_level'].toString();
-    } else if (title == 'Ignition') {
-      value = mockData['motor']['is_ignition_ready'].toString();
-    } else if (title == 'Helmet') {
-      value = mockData['helmet']['is_worn'].toString();
-    } else if (title == 'IoT') {
-      value = mockData['gps']['latitude'].toString();
+    try {
+      if (title == 'Alcohol Level') {
+        value = mockData['helmet']['alcohol_level'].toString();
+      } else if (title == 'Ignition') {
+        value = mockData['motor']['is_ignition_ready'].toString();
+      } else if (title == 'Helmet') {
+        value = mockData['helmet']['is_worn'].toString();
+      } else if (title == 'IoT') {
+        value = mockData['gps']['latitude'].toString();
+      }
+    } catch (e) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
     }
     return Container(
       width: MediaQuery.of(context).size.width / 4.5,
@@ -55,7 +63,7 @@ class DetailCards extends ConsumerWidget {
             ),
           ),
           Text(
-            value,
+            value ?? 'N/A',
             style: const TextStyle(
               fontSize: 12.0,
               fontWeight: FontWeight.bold,
@@ -74,7 +82,8 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<MapScreen>
+    with SingleTickerProviderStateMixin {
   double _lastX = 0.0;
   double _lastY = 0.0;
   double _lastZ = 0.0;
@@ -82,15 +91,35 @@ class _MapScreenState extends State<MapScreen> {
   double _lastTime = 0.0;
   double _sheetTop = 500.0; // initial position of the bottom sheet
   bool _showBottomSheet = false; // flag to show/hide the bottom sheet
+  AnimationController? _animationController;
+  double _speed = 0.0;
 
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 500),
+    )..repeat(reverse: true);
+    _initSpeedDetection();
   }
 
   @override
   void dispose() {
+    _animationController!.dispose();
     super.dispose();
+  }
+
+  Future<void> _initSpeedDetection() async {
+    Geolocator.getPositionStream().listen((Position position) {
+      double speed = position.speed ?? 0.0;
+      if (speed < 0) {
+        speed = 0;
+      }
+      setState(() {
+        _speed = speed * 3.6;
+      });
+    });
   }
 
   void _sendSMS(String message, List<String> recipents) async {
@@ -103,6 +132,8 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool inMotion = _speed >= 2.0;
+    bool showAnimation = _speed >= 5.0;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -154,21 +185,10 @@ class _MapScreenState extends State<MapScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16.0),
-              // child: TextField(
-              //   onTap: () {
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(
-              //         builder: (context) => MapSearchScreen(),
-              //       ),
-              //     );
-              //   },
-              //   decoration: const InputDecoration(
-              //     hintText: 'Search',
-              //     prefixIcon: Icon(Icons.search),
-              //     border: OutlineInputBorder(),
-              //   ),
-              // ),
+              child: MotorcycleContainer(
+                animationController: _animationController,
+                speed: _speed,
+              ),
             ),
             Container(
               color: Colors.grey[300],
