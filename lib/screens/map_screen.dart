@@ -92,7 +92,7 @@ class _MapScreenState extends State<MapScreen>
   double _sheetTop = 500.0; // initial position of the bottom sheet
   bool _showBottomSheet = false; // flag to show/hide the bottom sheet
   AnimationController? _animationController;
-  double _speed = 10.0;
+  double _speed = 0.0;
 
   @override
   void initState() {

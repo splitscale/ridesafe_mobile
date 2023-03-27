@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 class MotorcycleContainer extends StatelessWidget {
   double speed;
-  AnimationController? _animationController;
+  AnimationController? animationController;
   MotorcycleContainer({
     Key? key,
     required this.speed,
-    required AnimationController? animationController,
+    required this.animationController,
   }) : super(key: key);
 
   @override
@@ -46,9 +46,9 @@ class MotorcycleContainer extends StatelessWidget {
           ),
           if (showAnimation)
             AnimatedBuilder(
-              animation: _animationController!,
+              animation: animationController!,
               builder: (_, child) => Transform.rotate(
-                angle: _animationController!.value * 6.3,
+                angle: animationController!.value * 6.3,
                 child: child!,
               ),
               child: Icon(
