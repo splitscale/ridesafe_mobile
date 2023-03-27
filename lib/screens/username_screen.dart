@@ -29,13 +29,13 @@ class UsernameScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Card(
-              color: Colors.grey[200],
+              color: Color.fromARGB(100, 95, 148, 200),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
-                side: BorderSide(
-                  color: Colors.grey.shade400,
-                  width: 1.0,
-                ),
+                // side: BorderSide(
+                //   color: Colors.grey.shade400,
+                //   width: 1.0,
+                // ),
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -45,7 +45,8 @@ class UsernameScreen extends ConsumerWidget {
                     const SizedBox(height: 16.0),
                     const Text(
                       'Enter Username',
-                      style: TextStyle(fontSize: 20),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8.0),
                     TextFormField(
@@ -82,10 +83,11 @@ class UsernameScreen extends ConsumerWidget {
                         filled: true,
                       ),
                     ),
-                    const SizedBox(height: 16.0),
+                    const SizedBox(height: 30.0),
                     const Text(
                       'Choose Selection',
-                      style: TextStyle(fontSize: 20),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8.0),
                     Row(
@@ -102,7 +104,10 @@ class UsernameScreen extends ConsumerWidget {
                                     userType: value!);
                           },
                         ),
-                        const Text('Driver'),
+                        const Text('Driver',
+                            style: TextStyle(
+                              fontSize: 20,
+                            )),
                         const SizedBox(width: 32),
                         Radio<UserType>(
                           value: UserType.family,
@@ -115,7 +120,10 @@ class UsernameScreen extends ConsumerWidget {
                                     userType: value!);
                           },
                         ),
-                        const Text('Family'),
+                        const Text('Family',
+                            style: TextStyle(
+                              fontSize: 20,
+                            )),
                       ],
                     ),
                     const SizedBox(height: 16.0),
