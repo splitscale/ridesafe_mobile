@@ -20,23 +20,23 @@ class DetailCards extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var mockData = ref.watch(mockDataProvider);
-    late String? value;
+    String value = '10';
     // Alcoho Level, Ignition, Helmet, IoT
-    try {
-      if (title == 'Alcohol Level') {
-        value = mockData['helmet']['alcohol_level'].toString();
-      } else if (title == 'Ignition') {
-        value = mockData['motor']['is_ignition_ready'].toString();
-      } else if (title == 'Helmet') {
-        value = mockData['helmet']['is_worn'].toString();
-      } else if (title == 'IoT') {
-        value = mockData['gps']['latitude'].toString();
-      }
-    } catch (e) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
+    // try {
+    //   if (title == 'Alcohol Level') {
+    //     value = mockData['helmet']['alcohol_level'].toString();
+    //   } else if (title == 'Ignition') {
+    //     value = mockData['motor']['is_ignition_ready'].toString();
+    //   } else if (title == 'Helmet') {
+    //     value = mockData['helmet']['is_worn'].toString();
+    //   } else if (title == 'IoT') {
+    //     value = mockData['gps']['latitude'].toString();
+    //   }
+    // } catch (e) {
+    //   return const Center(
+    //     child: CircularProgressIndicator(),
+    //   );
+    // }
     return Container(
       width: MediaQuery.of(context).size.width / 4.5,
       height: MediaQuery.of(context).size.width / 3.5 * 1.5,
@@ -136,12 +136,7 @@ class _MapScreenState extends State<MapScreen>
     bool showAnimation = _speed >= 5.0;
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        backgroundColor: const Color.fromARGB(255, 2, 56, 110),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -149,6 +144,7 @@ class _MapScreenState extends State<MapScreen>
               // width is less
               style: ElevatedButton.styleFrom(
                 fixedSize: const Size(100, 30),
+                backgroundColor: Color.fromARGB(255, 48, 152, 255),
               ),
               child: const Text('Emergency Contacts',
                   style: TextStyle(fontSize: 14.0)),

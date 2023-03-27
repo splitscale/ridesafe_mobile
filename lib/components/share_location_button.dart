@@ -13,6 +13,7 @@ class ShareLiveLocationButton extends ConsumerWidget {
         // width is less
         style: ElevatedButton.styleFrom(
           fixedSize: const Size(100, 30),
+          backgroundColor: Color.fromARGB(255, 48, 152, 255),
         ),
         onPressed: () async {
           await Share.share(
