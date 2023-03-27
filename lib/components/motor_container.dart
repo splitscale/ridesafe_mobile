@@ -15,11 +15,11 @@ class MotorcycleContainer extends StatelessWidget {
     bool showAnimation = speed >= 5.0;
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.black,
-          width: 2,
-        ),
-      ),
+          border: Border.all(
+            color: const Color.fromARGB(255, 2, 56, 110),
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(10)),
       padding: const EdgeInsets.all(8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -28,7 +28,9 @@ class MotorcycleContainer extends StatelessWidget {
             children: [
               Icon(
                 Icons.motorcycle,
-                color: inMotion ? Colors.red : null,
+                color: inMotion
+                    ? Colors.red
+                    : const Color.fromARGB(255, 2, 56, 110),
               ),
               SizedBox(width: 8.0),
               Text(

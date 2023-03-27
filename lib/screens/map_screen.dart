@@ -17,10 +17,24 @@ class DetailCards extends ConsumerWidget {
 
   const DetailCards({Key? key, required this.title}) : super(key: key);
 
+  IconData _getIconForTitle(String title) {
+    switch (title) {
+      case 'Alcohol Level':
+        return Icons.local_bar;
+      case 'Ignition Status':
+        return Icons.power_settings_new;
+      case 'Helmet Status':
+        return Icons.motorcycle_outlined;
+      default:
+        return Icons.info_outline;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var mockData = ref.watch(mockDataProvider);
     String value = '10';
+    var icon = _getIconForTitle(title);
     // Alcoho Level, Ignition, Helmet, IoT
     // try {
     //   if (title == 'Alcohol Level') {
@@ -38,12 +52,16 @@ class DetailCards extends ConsumerWidget {
     //   );
     // }
     return Container(
-      width: MediaQuery.of(context).size.width / 4.5,
-      height: MediaQuery.of(context).size.width / 3.5 * 1.5,
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+      width: MediaQuery.of(context).size.width / 3.5,
+      height: MediaQuery.of(context).size.width / 3.5 * 1.75,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(
+          color: Colors.grey.shade300,
+          width: 1.0,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.5),
@@ -54,18 +72,28 @@ class DetailCards extends ConsumerWidget {
         ],
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Icon(
+            icon,
+            size: 32.0,
+            color: Colors.blue,
+          ),
+          const SizedBox(height: 16.0),
           Text(
             title,
+            textAlign: TextAlign.center,
             style: const TextStyle(
+              fontSize: 16.0,
               fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 16.0),
           Text(
             value ?? 'N/A',
+            textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 12.0,
+              fontSize: 20.0,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -196,11 +224,10 @@ class _MapScreenState extends State<MapScreen>
             const SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
+              children: const [
                 DetailCards(title: 'Alcohol Level'),
-                DetailCards(title: 'Ignition'),
-                DetailCards(title: 'Helmet'),
-                DetailCards(title: 'IoT'),
+                DetailCards(title: 'Ignition Status'),
+                DetailCards(title: 'Helmet Status'),
               ],
             ),
           ],
