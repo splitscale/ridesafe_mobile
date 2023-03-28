@@ -142,6 +142,7 @@ class MapSampleState extends State<MapSample> {
 
   Set<Marker> _markers = {};
 
+  // ignore: prefer_final_fields
   List<Location> _locations = [
     Location(
       name: 'Western Visayas Medical Center',
@@ -241,6 +242,15 @@ class MapSampleState extends State<MapSample> {
         icon: _getMarkerIcon(location.type),
       );
     }).toSet();
+    _markers.add(
+      Marker(
+        markerId: const MarkerId('Current Location'),
+        position: _center!,
+        infoWindow: const InfoWindow(
+          title: 'Current Location',
+        ),
+      ),
+    );
   }
 
   BitmapDescriptor _getMarkerIcon(LocationType type) {

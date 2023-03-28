@@ -35,6 +35,14 @@ class DetailCards extends ConsumerWidget {
     var mockData = ref.watch(mockDataProvider);
     String value = '10';
     var icon = _getIconForTitle(title);
+    if (title == 'Alcohol Level') {
+      value = '87';
+    } else if (title == 'Ignition Status') {
+      value = 'On';
+    } else if (title == 'Helmet Status') {
+      value = 'Worn';
+    }
+
     // Alcoho Level, Ignition, Helmet, IoT
     // try {
     //   if (title == 'Alcohol Level') {
