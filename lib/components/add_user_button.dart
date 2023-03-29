@@ -10,6 +10,7 @@ import 'package:shca_test/providers/username_provider.dart';
 import 'package:shca_test/screens/family_share_screen.dart';
 import 'package:shca_test/screens/map_screen.dart';
 import 'package:crypto/crypto.dart';
+import 'package:geolocator/geolocator.dart';
 
 class AddUser extends ConsumerWidget {
   final String username;
@@ -22,13 +23,18 @@ class AddUser extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
 
-    Future<void> addUser() {
+    Future<void> addUser() async {
+      Position position = await Geolocator.getCurrentPosition();
+      double latitude = position.latitude;
+      double longitude = position.longitude;
       return users
           .doc(username)
           .set({
             'username': username,
             'userType': userType.toString(),
-            'familyCode': sha1.convert(utf8.encode(username)).toString()
+            'familyCode': sha1.convert(utf8.encode(username)).toString(),
+            'latitude': latitude,
+            'longitude': longitude,
           })
           .then((value) => print("User Added"))
           .catchError((error) => print("Failed to add user: $error"));

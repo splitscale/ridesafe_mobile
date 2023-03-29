@@ -2,12 +2,69 @@ import 'package:flutter/material.dart';
 import 'package:shca_test/screens/family_map_view_screen.dart';
 import 'package:shca_test/providers/username_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FamilyOptionScreen extends ConsumerWidget {
-  const FamilyOptionScreen({super.key});
+class FamilyOptionScreen extends StatefulWidget {
+  const FamilyOptionScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  State<FamilyOptionScreen> createState() => _FamilyOptionScreenState();
+}
+
+class _FamilyOptionScreenState extends State<FamilyOptionScreen> {
+  final TextEditingController _familyCodeController = TextEditingController();
+  String _familyCode = '';
+
+  Future<void> _onTrackPressed() async {
+    final familyCode = _familyCodeController.text;
+    final docSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('familyCode', isEqualTo: familyCode)
+        .get();
+    final doc = docSnapshot.docs.first;
+    var latitude = doc.data()['latitude'];
+    var longitude = doc.data()['longitude'];
+    var name = doc.data()['username'];
+    if (doc != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FamilyMapViewScreen(
+            name: name,
+            latitude: latitude,
+            longitude: longitude,
+          ),
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Invalid Code'),
+            content: const Text('The family code you entered is invalid.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _familyCodeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -31,10 +88,16 @@ class FamilyOptionScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16.0),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 32.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child: TextField(
-              decoration: InputDecoration(
+              controller: _familyCodeController,
+              onChanged: (value) {
+                setState(() {
+                  _familyCode = value;
+                });
+              },
+              decoration: const InputDecoration(
                 hintText: 'Enter Code',
               ),
             ),
@@ -49,14 +112,7 @@ class FamilyOptionScreen extends ConsumerWidget {
                     fixedSize: const Size(200, 50),
                     backgroundColor: const Color.fromARGB(255, 2, 56, 110),
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => FamilyMapViewScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: _onTrackPressed,
                   child: const Text('Track'),
                 ),
               ),

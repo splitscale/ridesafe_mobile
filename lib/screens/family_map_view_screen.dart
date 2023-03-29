@@ -1,8 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class FamilyMapViewScreen extends StatelessWidget {
+  final double latitude;
+  final double longitude;
+  final String name;
+
+  const FamilyMapViewScreen({
+    Key? key,
+    required this.latitude,
+    required this.longitude,
+    required this.name,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    final LatLng initialPosition = LatLng(latitude, longitude);
+    final CameraPosition initialCameraPosition =
+        CameraPosition(target: initialPosition, zoom: 15.0);
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -26,67 +42,22 @@ class FamilyMapViewScreen extends StatelessWidget {
           ),
           SizedBox(height: 8.0),
           Text(
-            'No location available',
+            'Location available',
             style: TextStyle(
               fontSize: 16.0,
             ),
           ),
           SizedBox(height: 32.0),
           Expanded(
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 1.0,
+            child: GoogleMap(
+              initialCameraPosition: initialCameraPosition,
+              markers: {
+                Marker(
+                  markerId: MarkerId('person'),
+                  position: initialPosition,
+                  infoWindow: InfoWindow(title: name),
                 ),
-              ),
-              child: Stack(
-                children: [
-                  Center(
-                    child: Container(
-                      width: 50.0,
-                      height: 50.0,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.blue,
-                          width: 2.0,
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.location_on,
-                        color: Colors.red,
-                        size: 30.0,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 16.0,
-                    left: 0.0,
-                    right: 0.0,
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Text(
-                            'Username',
-                            style: TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            'No location available',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              },
             ),
           ),
           SizedBox(height: 16.0),
