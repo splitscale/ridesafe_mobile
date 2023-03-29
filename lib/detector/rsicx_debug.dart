@@ -55,7 +55,5 @@ calculateSpeed() {
     distance += 0.5 * acceleration * pow(timeInSeconds, 2);
 
     speed = distance / (now.millisecondsSinceEpoch / 1000.0);
-
-    print('calculated speed: ${speed.round()} raw speed: $speed');
   });
 }

@@ -9,6 +9,7 @@ import 'package:shca_test/providers/json_provider.dart';
 import 'package:shca_test/providers/username_provider.dart';
 import 'package:shca_test/screens/family_share_screen.dart';
 import 'package:shca_test/screens/map_screen.dart';
+import 'package:crypto/crypto.dart';
 
 class AddUser extends ConsumerWidget {
   final String username;
@@ -27,6 +28,7 @@ class AddUser extends ConsumerWidget {
           .set({
             'username': username,
             'userType': userType.toString(),
+            'familyCode': sha1.convert(utf8.encode(username)).toString()
           })
           .then((value) => print("User Added"))
           .catchError((error) => print("Failed to add user: $error"));
