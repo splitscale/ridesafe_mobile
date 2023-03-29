@@ -50,7 +50,7 @@ dependencies:
   # The following adds the ridesafe api
   ridesafe_api:
     git: https://github.com/splitscale/ridesafe_api.git
-    
+
   ridesafe_engine:
     git: https://github.com/splitscale/ridesafe_engine.git
 
@@ -62,6 +62,7 @@ dependencies:
   cloud_firestore: ^4.4.5
   flutter_bluetooth_serial: ^0.4.0
   crypto: ^3.0.2
+  image: ^4.0.15
 
 dev_dependencies:
   flutter_test:
@@ -88,7 +89,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/logo.png
+    - assets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

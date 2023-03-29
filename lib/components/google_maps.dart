@@ -1,120 +1,21 @@
-// import 'dart:async';
-// import 'package:flutter/material.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
-// import 'package:geolocator/geolocator.dart';
-
-// class MapSample extends StatefulWidget {
-//   const MapSample({Key? key}) : super(key: key);
-
-//   @override
-//   State<MapSample> createState() => MapSampleState();
-// }
-
-// class MapSampleState extends State<MapSample> {
-//   final Completer<GoogleMapController> _controller =
-//       Completer<GoogleMapController>();
-
-//   LatLng? _center;
-
-//   StreamSubscription<Position>? _positionStreamSubscription;
-
-//   Set<Marker> _markers = {};
-
-//   void _addMarkers() {
-//     // add current location
-//     _markers.add(Marker(
-//       markerId: const MarkerId('current'),
-//       position: _center!,
-//       infoWindow: const InfoWindow(title: 'Current Location'),
-//     ));
-//     _markers.add(Marker(
-//       markerId: const MarkerId('wvmc'),
-//       position: const LatLng(10.697478, 122.554337),
-//       infoWindow: const InfoWindow(title: 'Western Visayas Medical Center'),
-//     ));
-//     _markers.add(Marker(
-//       markerId: const MarkerId('csmc'),
-//       position: const LatLng(10.695792, 122.561736),
-//       infoWindow: const InfoWindow(title: 'CPU Medical Center'),
-//     ));
-//     // Add more markers for other emergency centers here
-//   }
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _getCurrentLocation();
-//   }
-
-//   @override
-//   void dispose() {
-//     super.dispose();
-//     _positionStreamSubscription?.cancel();
-//   }
-
-//   void _getCurrentLocation() async {
-//     bool serviceEnabled;
-//     LocationPermission permission;
-
-//     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-//     if (!serviceEnabled) {
-//       return Future.error('Location services are disabled.');
-//     }
-
-//     permission = await Geolocator.checkPermission();
-//     if (permission == LocationPermission.denied) {
-//       permission = await Geolocator.requestPermission();
-//       if (permission == LocationPermission.denied) {
-//         return Future.error('Location permissions are denied');
-//       }
-//     }
-
-//     if (permission == LocationPermission.deniedForever) {
-//       return Future.error(
-//           'Location permissions are permanently denied, we cannot request permissions.');
-//     }
-
-//     _positionStreamSubscription =
-//         Geolocator.getPositionStream().listen((Position position) {
-//       setState(() {
-//         _center = LatLng(position.latitude, position.longitude);
-//       });
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     _addMarkers();
-//     return _center == null
-//         ? const Center(child: CircularProgressIndicator())
-//         : GoogleMap(
-//             mapType: MapType.hybrid,
-//             initialCameraPosition: CameraPosition(target: _center!, zoom: 14.0),
-//             onMapCreated: (GoogleMapController controller) {
-//               _controller.complete(controller);
-//             },
-//             markers: _markers,
-//           );
-//   }
-// }
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter/services.dart';
+import 'dart:ui';
+import 'package:image/image.dart' as img;
 
 class Location {
   final String name;
   final LatLng latLng;
   final String phone;
-  final String imageUrl;
   final LocationType type;
 
   Location({
     required this.name,
     required this.latLng,
     required this.phone,
-    required this.imageUrl,
     required this.type,
   });
 }
@@ -145,48 +46,96 @@ class MapSampleState extends State<MapSample> {
   // ignore: prefer_final_fields
   List<Location> _locations = [
     Location(
-      name: 'Western Visayas Medical Center',
-      latLng: const LatLng(10.7043, 122.5473),
-      phone: '033 321 1243',
-      imageUrl:
-          'https://lh5.googleusercontent.com/p/AF1QipPjRlNn8ZvNlV7wTmEM1aKy7r8cTavTj7sQF9m9=w408-h306-k-no',
-      type: LocationType.Hospital,
-    ),
-    Location(
-      name: 'Iloilo Mission Hospital',
-      latLng: const LatLng(10.6984, 122.5642),
-      phone: '033 335 0888',
-      imageUrl:
-          'https://lh5.googleusercontent.com/p/AF1QipOw-lMJbVREcFcdlWfJdGyL6g-bB7jQ-KmFbY8z=w408-h408-k-no',
-      type: LocationType.Hospital,
-    ),
-    Location(
-      name: 'Mandurriao Police Station',
-      latLng: const LatLng(10.7120, 122.5472),
+      name: 'Iloilo Red Cross',
+      latLng: const LatLng(10.704088866767679, 122.56845539693349),
       phone: '033 321 3594',
-      imageUrl:
-          'https://lh5.googleusercontent.com/p/AF1QipN2Fgzmp9R4sh4PH4fB8YRhZwbuTRJddGv2LsAS=w408-h306-k-no',
+      type: LocationType.Hospital,
+    ),
+    Location(
+      name: 'BFP Iloilo City',
+      latLng: const LatLng(10.7045, 122.56794),
+      phone: '033 336 2513',
+      type: LocationType.FireStation,
+    ),
+    Location(
+      name: 'Barrio Obrero BFP',
+      latLng: const LatLng(10.69948, 122.58792),
+      phone: '033 335 0215',
+      type: LocationType.FireStation,
+    ),
+    Location(
+      name: 'Arevalo BFP',
+      latLng: const LatLng(10.6877, 122.5166),
+      phone: '033 337 7100',
+      type: LocationType.FireStation,
+    ),
+    Location(
+      name: 'Jaro BFP',
+      latLng: const LatLng(10.726209554107172, 122.55738818528928),
+      phone: '033 329 1993',
+      type: LocationType.FireStation,
+    ),
+    Location(
+      name: 'Mandurriao BFP',
+      latLng: const LatLng(10.69399786234313, 122.57280802576847),
+      phone: '033 321 0565',
+      type: LocationType.FireStation,
+    ),
+    Location(
+      name: 'ICAG BFP',
+      latLng: const LatLng(10.720612069710988, 122.56204423470204),
+      phone: '033 321 2066',
+      type: LocationType.FireStation,
+    ),
+    Location(
+      name: 'Iloilo City PNP',
+      latLng: const LatLng(10.70236322712234, 122.56420550887631),
+      phone: '033 320 8733',
       type: LocationType.PoliceStation,
     ),
     Location(
-      name: 'La Paz Fire Station',
-      latLng: const LatLng(10.6937, 122.5591),
-      phone: '033 320 0322',
-      imageUrl:
-          'https://lh5.googleusercontent.com/p/AF1QipN5St7OZ_1HSpVLxvyjKv88d-znWfDIiw0JvpX9=w408-h306-k-no',
+      name: 'Lapaz PNP',
+      latLng: const LatLng(10.712301596459799, 122.5716517025522),
+      phone: '033 320 3036',
+      type: LocationType.PoliceStation,
+    ),
+    Location(
+      name: 'Molo PNP',
+      latLng: const LatLng(10.705330433152415, 122.54383411886329),
+      phone: '033 336 2838',
+      type: LocationType.PoliceStation,
+    ),
+    Location(
+      name: 'Jaro PNP',
+      latLng: const LatLng(10.72602484861084, 122.55910510044669),
+      phone: '033 329 4315',
+      type: LocationType.PoliceStation,
+    ),
+    Location(
+      name: 'St. Pauls',
+      latLng: const LatLng(10.702011874734593, 122.56679854629972),
+      phone: '033 320 8733',
+      type: LocationType.Hospital,
+    ),
+    Location(
+      name: 'Doctor\'s',
+      latLng: const LatLng(10.696793613239848, 122.5543969527578),
+      phone: '033 320 8733',
+      type: LocationType.Hospital,
+    ),
+    Location(
+      name: 'Western',
+      latLng: const LatLng(10.719011991544923, 122.54168142761465),
+      phone: '033 320 8733',
+      type: LocationType.Hospital,
+    ),
+    Location(
+      name: 'Red Cross Iloilo',
+      latLng: const LatLng(10.704088866767679, 122.56845539693349),
+      phone: '033 320 8733',
       type: LocationType.FireStation,
     ),
   ];
-
-  BitmapDescriptor _hospitalMarker = BitmapDescriptor.defaultMarkerWithHue(
-    BitmapDescriptor.hueRed,
-  );
-  BitmapDescriptor _policeStationMarker = BitmapDescriptor.defaultMarkerWithHue(
-    BitmapDescriptor.hueBlue,
-  );
-  BitmapDescriptor _fireStationMarker = BitmapDescriptor.defaultMarkerWithHue(
-    BitmapDescriptor.hueOrange,
-  );
 
   @override
   void initState() {
@@ -230,18 +179,32 @@ class MapSampleState extends State<MapSample> {
     });
   }
 
-  void _addMarkers() {
-    _markers = _locations.map((location) {
-      return Marker(
-        markerId: MarkerId(location.name),
-        position: location.latLng,
-        infoWindow: InfoWindow(
-          title: location.name,
-          snippet: location.phone,
-        ),
-        icon: _getMarkerIcon(location.type),
+  void _addMarkers() async {
+    for (var location in _locations) {
+      final Uint8List markerIcon = await _getMarkerIcon(
+        location.type == LocationType.Hospital
+            ? 'assets/hospital.png'
+            : location.type == LocationType.FireStation
+                ? 'assets/emergency.png'
+                : location.type == LocationType.PoliceStation
+                    ? 'assets/police.png'
+                    : 'assets/emergency.png',
       );
-    }).toSet();
+      _markers.add(
+        Marker(
+          markerId: MarkerId(location.name),
+          position: location.latLng,
+          infoWindow: InfoWindow(
+            title: location.name,
+            snippet: location.phone,
+          ),
+          // icon load from image
+          icon: BitmapDescriptor.fromBytes(markerIcon),
+          // change size
+        ),
+      );
+    }
+
     _markers.add(
       Marker(
         markerId: const MarkerId('Current Location'),
@@ -253,15 +216,13 @@ class MapSampleState extends State<MapSample> {
     );
   }
 
-  BitmapDescriptor _getMarkerIcon(LocationType type) {
-    switch (type) {
-      case LocationType.Hospital:
-        return _hospitalMarker;
-      case LocationType.PoliceStation:
-        return _policeStationMarker;
-      case LocationType.FireStation:
-        return _fireStationMarker;
-    }
+  Future<Uint8List> _getMarkerIcon(String assetName) async {
+    final image = await rootBundle.load(assetName);
+    final codec = await instantiateImageCodec(image.buffer.asUint8List(),
+        targetHeight: 100);
+    final frame = await codec.getNextFrame();
+    final data = await frame.image.toByteData(format: ImageByteFormat.png);
+    return data!.buffer.asUint8List();
   }
 
   @override
