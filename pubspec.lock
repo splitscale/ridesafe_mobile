@@ -570,6 +570,15 @@ packages:
       url: "https://github.com/splitscale/ridesafe_core.git"
     source: git
     version: "1.0.0"
+  ridesafe_engine:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: a880d4f9ca420ecfb6c53d8f329cfcca04419682
+      url: "https://github.com/splitscale/ridesafe_engine.git"
+    source: git
+    version: "1.0.0"
   ridesafe_local_database_impl:
     dependency: transitive
     description:

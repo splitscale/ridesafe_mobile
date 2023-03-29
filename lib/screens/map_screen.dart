@@ -12,6 +12,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shca_test/providers/json_provider.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../detector/rsicx_debug.dart';
+
 class DetailCards extends ConsumerWidget {
   final String title;
 
@@ -138,6 +140,9 @@ class _MapScreenState extends State<MapScreen>
       duration: Duration(milliseconds: 500),
     )..repeat(reverse: true);
     _initSpeedDetection();
+
+    // debug detectors
+    debugRsicx();
   }
 
   @override

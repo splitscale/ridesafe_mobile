@@ -50,9 +50,13 @@ dependencies:
   # The following adds the ridesafe api
   ridesafe_api:
     git: https://github.com/splitscale/ridesafe_api.git
+    
+  ridesafe_engine:
+    git: https://github.com/splitscale/ridesafe_engine.git
 
   ridesafe_core:
     git: https://github.com/splitscale/ridesafe_core.git
+
   firebase_core: ^2.8.0
   flutter_sms: ^2.3.3
   cloud_firestore: ^4.4.5
