@@ -17,8 +17,9 @@ import 'package:shca_test/ridesafe_bluetooth/bluetooth_actions_handler.dart';
 import 'package:shca_test/ridesafe_bluetooth/bluetooth_scanning_handler.dart';
 import 'package:shca_test/widgets/stream_text.dart';
 import 'package:shca_test/utils/bluetooth_parser.dart';
+import 'package:shca_test/providers/bluetooth_provider.dart';
 
-class AddUser extends StatefulWidget {
+class AddUser extends ConsumerStatefulWidget {
   final String username;
   final UserType userType;
   final Ridesafe ridesafe;
@@ -34,28 +35,13 @@ class AddUser extends StatefulWidget {
   _AddUserState createState() => _AddUserState();
 }
 
-class _AddUserState extends State<AddUser> {
+class _AddUserState extends ConsumerState<AddUser> {
   late BluetoothScanningHandler _service;
   late BluetoothActionsHandler _actionsHandler;
 
   final TextEditingController _textEditingController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
 
-  JsonParser bluetoothData = JsonParser('{"a": 654, "b":0}');
-  late final Stream<String> _logStream;
-
-  bool _isConnected = false;
-
-  void _handleTextFieldSubmit(String str) {
-    setState(() {
-      _textEditingController.clear();
-      _actionsHandler.send(_textEditingController.text);
-    });
-  }
-
-  bool _checkConnection() {
-    return _actionsHandler.isConnected;
-  }
+  late final BluetoothDataProvider _bluetoothDataProvider;
 
   void _handleConnection() async {
     try {
@@ -63,15 +49,11 @@ class _AddUserState extends State<AddUser> {
 
       _actionsHandler = BluetoothActionsHandler(connectedDeviceController);
 
-      setState(() {
-        _isConnected = _checkConnection();
-      });
-
       _actionsHandler.startListening().listen((event) {
-        setState(() {
-          bluetoothData = JsonParser(event);
-          debugPrint(bluetoothData.toString());
-        });
+        final newBluetoothData = JsonParser(event);
+        debugPrint(newBluetoothData.toString());
+        // Update the BluetoothDataProvider state with newBluetoothData
+        _bluetoothDataProvider.update(newBluetoothData);
       });
     } catch (e) {
       debugPrint(e.toString());
@@ -82,6 +64,7 @@ class _AddUserState extends State<AddUser> {
   void initState() {
     super.initState();
     _service = BluetoothScanningHandler(widget.ridesafe);
+    ref.read(bluetoothDataProvider);
   }
 
   @override
@@ -93,45 +76,19 @@ class _AddUserState extends State<AddUser> {
 
   @override
   Widget build(BuildContext context) {
-    // debugPrint the bluetooth data to the console
-    return AddUserConsumer(
-      username: widget.username,
-      userType: widget.userType,
-      ridesafe: widget.ridesafe,
-      addBluetoothData: _handleConnection,
-      bluetoothData: bluetoothData,
-    );
-  }
-}
-
-class AddUserConsumer extends ConsumerWidget {
-  final String username;
-  final UserType userType;
-  final Ridesafe ridesafe;
-  final JsonParser bluetoothData;
-  void Function() addBluetoothData;
-  AddUserConsumer({
-    Key? key,
-    required this.username,
-    required this.userType,
-    required this.ridesafe,
-    required this.addBluetoothData,
-    required this.bluetoothData,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
     final users = FirebaseFirestore.instance.collection('users');
+    final bluetoothData = ref.watch(bluetoothDataProvider.notifier).state;
+
     Future<void> addUser() async {
       Position position = await Geolocator.getCurrentPosition();
       double latitude = position.latitude;
       double longitude = position.longitude;
       return users
-          .doc(username)
+          .doc(widget.username)
           .set({
-            'username': username,
-            'userType': userType.toString(),
-            'familyCode': sha1.convert(utf8.encode(username)).toString(),
+            'username': widget.username,
+            'userType': widget.userType.toString(),
+            'familyCode': sha1.convert(utf8.encode(widget.username)).toString(),
             'latitude': latitude,
             'longitude': longitude,
           })
@@ -151,12 +108,29 @@ class AddUserConsumer extends ConsumerWidget {
             borderRadius: BorderRadius.circular(20),
           ),
         ),
-        onPressed: () {
+        onPressed: () async {
           ref.read(userDetailsProvider.notifier).state = UserDetails(
               username: ref.watch(userDetailsProvider).username,
               userType: ref.watch(userDetailsProvider).userType);
-          addBluetoothData();
+
           addUser();
+          try {
+            final connectedDeviceController = await _service.scanAndConnect();
+
+            _actionsHandler =
+                BluetoothActionsHandler(connectedDeviceController);
+
+            // use timer.periodic to send data every 5 seconds
+            Timer.periodic(const Duration(seconds: 2), (timer) {
+              _actionsHandler.startListening().listen((event) {
+                final newBluetoothData = JsonParser(event);
+                // Update the BluetoothDataProvider state with newBluetoothData
+                _bluetoothDataProvider.update(newBluetoothData);
+              });
+            });
+          } catch (e) {
+            debugPrint(e.toString());
+          }
           // ignore: use_build_context_synchronously
           Navigator.push(
               context,
@@ -164,7 +138,7 @@ class AddUserConsumer extends ConsumerWidget {
                   builder: (context) =>
                       ref.watch(userDetailsProvider.notifier).state.userType ==
                               UserType.driver
-                          ? MapScreen(bluetoothData: bluetoothData)
+                          ? const MapScreen()
                           : const FamilyOptionScreen()));
         },
       ),

@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shca_test/providers/json_provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shca_test/utils/bluetooth_parser.dart';
+import 'package:shca_test/providers/bluetooth_provider.dart';
 
 import '../detector/rsicx_debug.dart';
 
@@ -107,15 +108,14 @@ class DetailCards extends ConsumerWidget {
   }
 }
 
-class MapScreen extends StatefulWidget {
-  final JsonParser bluetoothData;
-  const MapScreen({Key? key, required this.bluetoothData}) : super(key: key);
+class MapScreen extends ConsumerStatefulWidget {
+  const MapScreen({Key? key}) : super(key: key);
 
   @override
-  State<MapScreen> createState() => _MapScreenState();
+  ConsumerState<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen>
+class _MapScreenState extends ConsumerState<MapScreen>
     with SingleTickerProviderStateMixin {
   double _lastX = 0.0;
   double _lastY = 0.0;
@@ -130,6 +130,8 @@ class _MapScreenState extends State<MapScreen>
   @override
   void initState() {
     super.initState();
+    ref.read(bluetoothDataProvider);
+
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 500),
@@ -170,8 +172,10 @@ class _MapScreenState extends State<MapScreen>
   Widget build(BuildContext context) {
     bool inMotion = _speed >= 2.0;
     bool showAnimation = _speed >= 5.0;
-    String alcoholLevel = widget.bluetoothData.a.toString();
-    int helmetValue = widget.bluetoothData.b;
+    var bluetoothData = ref.watch(bluetoothDataProvider.notifier).state;
+
+    var alcoholLevel = bluetoothData.a.toString();
+    int helmetValue = bluetoothData.b;
     String helmetStatus = helmetValue == 0 ? 'Worn' : 'Not Worn';
     String ignitionStatus = helmetValue == 0 ? 'On' : 'Off';
     return Scaffold(
