@@ -635,6 +635,8 @@ PODS:
     - leveldb-library (~> 1.22)
     - nanopb (< 2.30910.0, >= 2.30908.0)
   - Flutter (1.0.0)
+  - flutter_ringtone_player (0.0.1):
+    - Flutter
   - flutter_sms (1.1.0):
     - Flutter
   - geolocator_apple (1.2.0):
@@ -721,6 +723,8 @@ PODS:
   - permission_handler_apple (9.0.4):
     - Flutter
   - PromisesObjC (2.2.0)
+  - sensors (0.0.1):
+    - Flutter
   - sensors_plus (0.0.1):
     - Flutter
   - share_plus (0.0.1):
@@ -732,11 +736,13 @@ DEPENDENCIES:
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - Flutter (from `Flutter`)
+  - flutter_ringtone_player (from `.symlinks/plugins/flutter_ringtone_player/ios`)
   - flutter_sms (from `.symlinks/plugins/flutter_sms/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
   - google_maps_flutter_ios (from `.symlinks/plugins/google_maps_flutter_ios/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - sensors (from `.symlinks/plugins/sensors/ios`)
   - sensors_plus (from `.symlinks/plugins/sensors_plus/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
@@ -765,6 +771,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_core/ios"
   Flutter:
     :path: Flutter
+  flutter_ringtone_player:
+    :path: ".symlinks/plugins/flutter_ringtone_player/ios"
   flutter_sms:
     :path: ".symlinks/plugins/flutter_sms/ios"
   geolocator_apple:
@@ -775,6 +783,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
+  sensors:
+    :path: ".symlinks/plugins/sensors/ios"
   sensors_plus:
     :path: ".symlinks/plugins/sensors_plus/ios"
   share_plus:
@@ -792,6 +802,7 @@ SPEC CHECKSUMS:
   FirebaseCoreInternal: c7cd505e2136811096b225ac388d6254a2622362
   FirebaseFirestore: f91b23a3c71448475d17163baf916d5d20d01609
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  flutter_ringtone_player: 15eba85187230b87b2512f0e1b92225618bc03e7
   flutter_sms: 91ce41530f55c85d6524d82307a5d555844c086a
   geolocator_apple: cc556e6844d508c95df1e87e3ea6fa4e58c50401
   google_maps_flutter_ios: 3e0b99383a8003b8169d06e7e324170bd0424105
@@ -805,6 +816,7 @@ SPEC CHECKSUMS:
   path_provider_foundation: c68054786f1b4f3343858c1e1d0caaded73f0be9
   permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
   PromisesObjC: 09985d6d70fbe7878040aa746d78236e6946d2ef
+  sensors: 84eb7a30e47a649e4172b71d6e81be614c280336
   sensors_plus: 5717760720f7e6acd96fdbd75b7428f5ad755ec2
   share_plus: 056a1e8ac890df3e33cb503afffaf1e9b4fbae68
   url_launcher_ios: 08a3dfac5fb39e8759aeb0abbd5d9480f30fc8b4

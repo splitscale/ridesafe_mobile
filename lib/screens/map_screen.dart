@@ -1,8 +1,7 @@
-import 'dart:typed_data';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:shca_test/screens/emergency_contacts_screen.dart';
-import 'package:shca_test/screens/map_search_screen.dart';
 import 'package:shca_test/components/motor_container.dart';
 import 'package:shca_test/screens/summary_screen.dart';
 import 'package:shca_test/components/google_maps.dart';
@@ -16,7 +15,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shca_test/utils/bluetooth_parser.dart';
 import 'package:shca_test/providers/bluetooth_provider.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
-import 'package:shake/shake.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 
 import '../detector/rsicx_debug.dart';
 
@@ -44,22 +43,6 @@ class DetailCards extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var mockData = ref.watch(mockDataProvider);
     var icon = _getIconForTitle(title);
-    // Alcoho Level, Ignition, Helmet, IoT
-    // try {
-    //   if (title == 'Alcohol Level') {
-    //     value = mockData['helmet']['alcohol_level'].toString();
-    //   } else if (title == 'Ignition') {
-    //     value = mockData['motor']['is_ignition_ready'].toString();
-    //   } else if (title == 'Helmet') {
-    //     value = mockData['helmet']['is_worn'].toString();
-    //   } else if (title == 'IoT') {
-    //     value = mockData['gps']['latitude'].toString();
-    //   }
-    // } catch (e) {
-    //   return const Center(
-    //     child: CircularProgressIndicator(),
-    //   );
-    // }
     return Container(
       width: MediaQuery.of(context).size.width / 3.5,
       height: MediaQuery.of(context).size.width / 3.5 * 1.75,
@@ -175,187 +158,90 @@ class _MapScreenState extends ConsumerState<MapScreen>
     String helmetStatus = helmetValue == 0 ? 'Worn' : 'Not Worn';
     String ignitionStatus = helmetValue == 0 ? 'On' : 'Off';
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 2, 56, 110),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              // width is less
-              style: ElevatedButton.styleFrom(
-                fixedSize: const Size(100, 30),
-                backgroundColor: Color.fromARGB(255, 48, 152, 255),
+        appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 2, 56, 110),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton(
+                // width is less
+                style: ElevatedButton.styleFrom(
+                  fixedSize: const Size(100, 30),
+                  backgroundColor: Color.fromARGB(255, 48, 152, 255),
+                ),
+                child: const Text('Emergency Contacts',
+                    style: TextStyle(fontSize: 14.0)),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EmergencyContactsScreen(),
+                    ),
+                  );
+                },
               ),
-              child: const Text('Emergency Contacts',
-                  style: TextStyle(fontSize: 14.0)),
+              const SizedBox(width: 16.0),
+              const ShareLiveLocationButton()
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.list),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EmergencyContactsScreen(),
+                    builder: (context) => const SummaryScreen(),
                   ),
                 );
               },
             ),
-            const SizedBox(width: 16.0),
-            const ShareLiveLocationButton()
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.list),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SummaryScreen(),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16.0),
+                child: MotorcycleContainer(
+                  animationController: _animationController,
+                  speed: _speed,
                 ),
-              );
-            },
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16.0),
-              child: MotorcycleContainer(
-                animationController: _animationController,
-                speed: _speed,
               ),
-            ),
-            Container(
-              color: Colors.grey[300],
-              width: double.infinity,
-              // auto
-              height: MediaQuery.of(context).size.width * 0.8,
-              child: const Center(child: MapSample()),
-            ),
-            const SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                DetailCards(title: 'Alcohol Level', value: alcoholLevel),
-                DetailCards(title: 'Ignition Status', value: ignitionStatus),
-                DetailCards(title: 'Helmet Status', value: helmetStatus),
-              ],
-            ),
-          ],
+              Container(
+                color: Colors.grey[300],
+                width: double.infinity,
+                // auto
+                height: MediaQuery.of(context).size.width * 0.8,
+                child: const Center(child: MapSample()),
+              ),
+              const SizedBox(height: 16.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  DetailCards(title: 'Alcohol Level', value: alcoholLevel),
+                  DetailCards(title: 'Ignition Status', value: ignitionStatus),
+                  DetailCards(title: 'Helmet Status', value: helmetStatus),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-      // floatingActionButton: FloatingActionButton(
-      //     onPressed: () {},
-      //     child: Icon(Icons.emergency),
-      //     backgroundColor: Colors.redAccent),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: const MyFloatingActionButton(),
-    );
+        floatingActionButton: const MyFloatingActionButton(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat);
   }
 }
 
-// class MyFloatingActionButton extends StatefulWidget {
-//   const MyFloatingActionButton({Key? key}) : super(key: key);
+class MyFloatingActionButton extends StatefulWidget {
+  const MyFloatingActionButton({Key? key}) : super(key: key);
 
-//   @override
-//   _MyFloatingActionButtonState createState() => _MyFloatingActionButtonState();
-// }
-
-// class _MyFloatingActionButtonState extends State<MyFloatingActionButton> {
-//   bool _showButtons = false;
-
-//   void _toggleButtons() {
-//     setState(() {
-//       _showButtons = !_showButtons;
-//     });
-//   }
-
-//   void _sendSMS(String message, List<String> recipents) async {
-//     String _result = await sendSMS(message: message, recipients: recipents)
-//         .catchError((onError) {
-//       print(onError);
-//     });
-//     print(_result);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       mainAxisAlignment: MainAxisAlignment.end,
-//       children: [
-//         AnimatedContainer(
-//           duration: const Duration(milliseconds: 200),
-//           curve: Curves.easeInOut,
-//           height: _showButtons ? 120 : 0,
-//           child: Row(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: [
-//               FloatingActionButton(
-//                 onPressed: () {
-//                   showModalBottomSheet(
-//                     context: context,
-//                     builder: (BuildContext context) {
-//                       return Container(
-//                         height: 200.0,
-//                         color: Colors.white,
-//                         child: Center(
-//                           child: ElevatedButton(
-//                               onPressed: () async {
-//                                 final contactsBox =
-//                                     Hive.box<Contact>('contacts');
-//                                 final phoneNumbers = contactsBox.values
-//                                     .map((contact) => contact.phone.toString())
-//                                     .toList();
-//                                 _sendSMS("Help me, I'm in an emergency!",
-//                                     phoneNumbers);
-//                               },
-//                               child: Text(
-//                                 'Press for Emergency',
-//                                 style: TextStyle(
-//                                   color: Colors.white,
-//                                 ),
-//                               ),
-//                               // circular, red button
-//                               style: ElevatedButton.styleFrom(
-//                                   backgroundColor: Colors.red,
-//                                   shape: CircleBorder(),
-//                                   padding: EdgeInsets.all(75))),
-//                         ),
-//                       );
-//                     },
-//                   );
-//                 },
-//                 heroTag: 'Button 1',
-//                 child: const Icon(Icons.emergency),
-//                 backgroundColor: Colors.redAccent,
-//               ),
-//               const SizedBox(width: 16),
-//               FloatingActionButton(
-//                 onPressed: () {
-//                   // Add your code here
-//                 },
-//                 heroTag: 'Button 2',
-//                 child: const Icon(Icons.radar),
-//                 backgroundColor: Colors.red,
-//               ),
-//             ],
-//           ),
-//         ),
-//         FloatingActionButton(
-//           onPressed: _toggleButtons,
-//           backgroundColor: const Color.fromARGB(255, 2, 56, 110),
-//           child:
-//               _showButtons ? const Icon(Icons.close) : const Icon(Icons.menu),
-//         ),
-//       ],
-//     );
-//   }
-// }
+  @override
+  _MyFloatingActionButtonState createState() => _MyFloatingActionButtonState();
+}
 
 class _MyFloatingActionButtonState extends State<MyFloatingActionButton> {
   bool _showButtons = false;
-  bool _detectingAccident = false;
 
   void _toggleButtons() {
     setState(() {
@@ -369,18 +255,6 @@ class _MyFloatingActionButtonState extends State<MyFloatingActionButton> {
       print(onError);
     });
     print(_result);
-  }
-
-  void _startDetectingAccident() {
-    setState(() {
-      _detectingAccident = true;
-    });
-  }
-
-  void _stopDetectingAccident() {
-    setState(() {
-      _detectingAccident = false;
-    });
   }
 
   @override
@@ -440,64 +314,126 @@ class _MyFloatingActionButtonState extends State<MyFloatingActionButton> {
                   showModalBottomSheet(
                     context: context,
                     builder: (BuildContext context) {
-                      return Container(
-                        height: 200.0,
-                        color: Colors.white,
-                        child: Center(
-                          child: ElevatedButton(
-                              onPressed: _detectingAccident
-                                  ? null
-                                  : _startDetectingAccident,
-                              child: Text(
-                                _detectingAccident
-                                    ? 'Detecting Accident...'
-                                    : 'Press for Automatic Accident Detection',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
-                              ),
-                              // circular, red button
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  shape: CircleBorder(),
-                                  padding: EdgeInsets.all(75))),
-                        ),
-                      );
+                      return EmergencyListenerModal();
                     },
                   );
                 },
                 heroTag: 'Button 2',
                 child: const Icon(Icons.radar),
-                backgroundColor: Colors.redAccent,
+                backgroundColor: Colors.red,
               ),
             ],
           ),
         ),
         FloatingActionButton(
           onPressed: _toggleButtons,
-          backgroundColor: Colors.redAccent,
+          backgroundColor: const Color.fromARGB(255, 2, 56, 110),
           child:
               _showButtons ? const Icon(Icons.close) : const Icon(Icons.menu),
         ),
       ],
     );
   }
+}
+
+class EmergencyListenerModal extends StatefulWidget {
+  @override
+  _EmergencyListenerModalState createState() => _EmergencyListenerModalState();
+}
+
+class _EmergencyListenerModalState extends State<EmergencyListenerModal> {
+  bool _isListening = false;
+  late StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
+  bool _isShaking = false;
+  bool _playSound = false;
 
   @override
-  void initState() {
-    super.initState();
-    ShakeDetector detector = ShakeDetector.autoStart(onPhoneShake: () {
-      if (_detectingAccident) {
-        FlutterRingtonePlayer.playAlarm();
-        _stopDetectingAccident();
+  void dispose() {
+    super.dispose();
+    _stopAccelerometer();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          const SizedBox(height: 16),
+          const Text(
+            "Automatic Emergency Listener",
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          GestureDetector(
+            onTap: () {
+              if (_isListening) {
+                _stopAccelerometer();
+              } else {
+                _startAccelerometer();
+              }
+              setState(() {
+                _isListening = !_isListening;
+              });
+            },
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _isListening ? Colors.red : Colors.green,
+              ),
+              child: Center(
+                child: Text(
+                  _isListening
+                      ? "Listening for Accidents..."
+                      : "Press to Listen",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  void _startAccelerometer() {
+    _accelerometerSubscription =
+        accelerometerEvents.listen((AccelerometerEvent event) {
+      if (event.x.abs() > 15 || event.y.abs() > 15 || event.z.abs() > 15) {
+        if (!_isShaking) {
+          setState(() {
+            _isShaking = true;
+          });
+          _playSound = true;
+        }
+      } else {
+        if (_isShaking) {
+          FlutterRingtonePlayer.play(fromAsset: "assets/alarm.mp3");
+
+          setState(() {
+            _isShaking = false;
+          });
+        }
       }
     });
   }
-}
 
-class MyFloatingActionButton extends StatefulWidget {
-  const MyFloatingActionButton({Key? key}) : super(key: key);
-
-  @override
-  _MyFloatingActionButtonState createState() => _MyFloatingActionButtonState();
+  void _stopAccelerometer() {
+    if (_accelerometerSubscription != null) {
+      _accelerometerSubscription!.cancel();
+      _accelerometerSubscription = null;
+    }
+    setState(() {
+      _isListening = false;
+      _isShaking = false;
+    });
+    _playSound = false;
+  }
 }

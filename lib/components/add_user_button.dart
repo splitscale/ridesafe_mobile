@@ -106,23 +106,25 @@ class _AddUserState extends ConsumerState<AddUser> {
               userType: ref.watch(userDetailsProvider).userType);
 
           addUser();
-          try {
-            final connectedDeviceController = await _service.scanAndConnect();
 
-            _actionsHandler =
-                BluetoothActionsHandler(connectedDeviceController);
+          // try {
+          //   final connectedDeviceController = await _service.scanAndConnect();
 
-            // use timer.periodic to send data every 5 seconds
-            Timer.periodic(const Duration(seconds: 2), (timer) {
-              _actionsHandler.startListening().listen((event) {
-                final newBluetoothData = JsonParser(event);
-                // Update the BluetoothDataProvider state with newBluetoothData
-                _bluetoothDataProvider.update(newBluetoothData);
-              });
-            });
-          } catch (e) {
-            debugPrint(e.toString());
-          }
+          //   _actionsHandler =
+          //       BluetoothActionsHandler(connectedDeviceController);
+
+          //   // use timer.periodic to send data every 5 seconds
+          //   Timer.periodic(const Duration(seconds: 2), (timer) {
+          //     _actionsHandler.startListening().listen((event) {
+          //       final newBluetoothData = JsonParser(event);
+          //       // Update the BluetoothDataProvider state with newBluetoothData
+          //       _bluetoothDataProvider.update(newBluetoothData);
+          //     });
+          //   });
+          // } catch (e) {
+          //   debugPrint(e.toString());
+          // }
+
           // ignore: use_build_context_synchronously
           Navigator.push(
               context,
