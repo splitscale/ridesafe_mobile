@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:shca_test/screens/emergency_contacts_screen.dart';
 import 'package:shca_test/screens/map_search_screen.dart';
@@ -13,6 +15,8 @@ import 'package:shca_test/providers/json_provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shca_test/utils/bluetooth_parser.dart';
 import 'package:shca_test/providers/bluetooth_provider.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
+import 'package:shake/shake.dart';
 
 import '../detector/rsicx_debug.dart';
 
@@ -160,14 +164,6 @@ class _MapScreenState extends ConsumerState<MapScreen>
     });
   }
 
-  void _sendSMS(String message, List<String> recipents) async {
-    String _result = await sendSMS(message: message, recipients: recipents)
-        .catchError((onError) {
-      print(onError);
-    });
-    print(_result);
-  }
-
   @override
   Widget build(BuildContext context) {
     bool inMotion = _speed >= 2.0;
@@ -249,43 +245,259 @@ class _MapScreenState extends ConsumerState<MapScreen>
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showModalBottomSheet(
-              context: context,
-              builder: (BuildContext context) {
-                return Container(
-                  height: 200.0,
-                  color: Colors.white,
-                  child: Center(
-                    child: ElevatedButton(
-                        onPressed: () async {
-                          final contactsBox = Hive.box<Contact>('contacts');
-                          final phoneNumbers = contactsBox.values
-                              .map((contact) => contact.phone.toString())
-                              .toList();
-                          _sendSMS(
-                              "Help me, I'm in an emergency!", phoneNumbers);
-                        },
-                        child: Text(
-                          'Press for Emergency',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                        // circular, red button
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            shape: CircleBorder(),
-                            padding: EdgeInsets.all(75))),
-                  ),
-                );
-              },
-            );
-          },
-          child: Icon(Icons.emergency),
-          backgroundColor: Colors.redAccent),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      // floatingActionButton: FloatingActionButton(
+      //     onPressed: () {},
+      //     child: Icon(Icons.emergency),
+      //     backgroundColor: Colors.redAccent),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: const MyFloatingActionButton(),
     );
   }
+}
+
+// class MyFloatingActionButton extends StatefulWidget {
+//   const MyFloatingActionButton({Key? key}) : super(key: key);
+
+//   @override
+//   _MyFloatingActionButtonState createState() => _MyFloatingActionButtonState();
+// }
+
+// class _MyFloatingActionButtonState extends State<MyFloatingActionButton> {
+//   bool _showButtons = false;
+
+//   void _toggleButtons() {
+//     setState(() {
+//       _showButtons = !_showButtons;
+//     });
+//   }
+
+//   void _sendSMS(String message, List<String> recipents) async {
+//     String _result = await sendSMS(message: message, recipients: recipents)
+//         .catchError((onError) {
+//       print(onError);
+//     });
+//     print(_result);
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       mainAxisAlignment: MainAxisAlignment.end,
+//       children: [
+//         AnimatedContainer(
+//           duration: const Duration(milliseconds: 200),
+//           curve: Curves.easeInOut,
+//           height: _showButtons ? 120 : 0,
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               FloatingActionButton(
+//                 onPressed: () {
+//                   showModalBottomSheet(
+//                     context: context,
+//                     builder: (BuildContext context) {
+//                       return Container(
+//                         height: 200.0,
+//                         color: Colors.white,
+//                         child: Center(
+//                           child: ElevatedButton(
+//                               onPressed: () async {
+//                                 final contactsBox =
+//                                     Hive.box<Contact>('contacts');
+//                                 final phoneNumbers = contactsBox.values
+//                                     .map((contact) => contact.phone.toString())
+//                                     .toList();
+//                                 _sendSMS("Help me, I'm in an emergency!",
+//                                     phoneNumbers);
+//                               },
+//                               child: Text(
+//                                 'Press for Emergency',
+//                                 style: TextStyle(
+//                                   color: Colors.white,
+//                                 ),
+//                               ),
+//                               // circular, red button
+//                               style: ElevatedButton.styleFrom(
+//                                   backgroundColor: Colors.red,
+//                                   shape: CircleBorder(),
+//                                   padding: EdgeInsets.all(75))),
+//                         ),
+//                       );
+//                     },
+//                   );
+//                 },
+//                 heroTag: 'Button 1',
+//                 child: const Icon(Icons.emergency),
+//                 backgroundColor: Colors.redAccent,
+//               ),
+//               const SizedBox(width: 16),
+//               FloatingActionButton(
+//                 onPressed: () {
+//                   // Add your code here
+//                 },
+//                 heroTag: 'Button 2',
+//                 child: const Icon(Icons.radar),
+//                 backgroundColor: Colors.red,
+//               ),
+//             ],
+//           ),
+//         ),
+//         FloatingActionButton(
+//           onPressed: _toggleButtons,
+//           backgroundColor: const Color.fromARGB(255, 2, 56, 110),
+//           child:
+//               _showButtons ? const Icon(Icons.close) : const Icon(Icons.menu),
+//         ),
+//       ],
+//     );
+//   }
+// }
+
+class _MyFloatingActionButtonState extends State<MyFloatingActionButton> {
+  bool _showButtons = false;
+  bool _detectingAccident = false;
+
+  void _toggleButtons() {
+    setState(() {
+      _showButtons = !_showButtons;
+    });
+  }
+
+  void _sendSMS(String message, List<String> recipents) async {
+    String _result = await sendSMS(message: message, recipients: recipents)
+        .catchError((onError) {
+      print(onError);
+    });
+    print(_result);
+  }
+
+  void _startDetectingAccident() {
+    setState(() {
+      _detectingAccident = true;
+    });
+  }
+
+  void _stopDetectingAccident() {
+    setState(() {
+      _detectingAccident = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          height: _showButtons ? 120 : 0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FloatingActionButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Container(
+                        height: 200.0,
+                        color: Colors.white,
+                        child: Center(
+                          child: ElevatedButton(
+                              onPressed: () async {
+                                final contactsBox =
+                                    Hive.box<Contact>('contacts');
+                                final phoneNumbers = contactsBox.values
+                                    .map((contact) => contact.phone.toString())
+                                    .toList();
+                                _sendSMS("Help me, I'm in an emergency!",
+                                    phoneNumbers);
+                              },
+                              child: Text(
+                                'Press for Emergency',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              // circular, red button
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  shape: CircleBorder(),
+                                  padding: EdgeInsets.all(75))),
+                        ),
+                      );
+                    },
+                  );
+                },
+                heroTag: 'Button 1',
+                child: const Icon(Icons.emergency),
+                backgroundColor: Colors.redAccent,
+              ),
+              const SizedBox(width: 16),
+              FloatingActionButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Container(
+                        height: 200.0,
+                        color: Colors.white,
+                        child: Center(
+                          child: ElevatedButton(
+                              onPressed: _detectingAccident
+                                  ? null
+                                  : _startDetectingAccident,
+                              child: Text(
+                                _detectingAccident
+                                    ? 'Detecting Accident...'
+                                    : 'Press for Automatic Accident Detection',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              // circular, red button
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  shape: CircleBorder(),
+                                  padding: EdgeInsets.all(75))),
+                        ),
+                      );
+                    },
+                  );
+                },
+                heroTag: 'Button 2',
+                child: const Icon(Icons.radar),
+                backgroundColor: Colors.redAccent,
+              ),
+            ],
+          ),
+        ),
+        FloatingActionButton(
+          onPressed: _toggleButtons,
+          backgroundColor: Colors.redAccent,
+          child:
+              _showButtons ? const Icon(Icons.close) : const Icon(Icons.menu),
+        ),
+      ],
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    ShakeDetector detector = ShakeDetector.autoStart(onPhoneShake: () {
+      if (_detectingAccident) {
+        FlutterRingtonePlayer.playAlarm();
+        _stopDetectingAccident();
+      }
+    });
+  }
+}
+
+class MyFloatingActionButton extends StatefulWidget {
+  const MyFloatingActionButton({Key? key}) : super(key: key);
+
+  @override
+  _MyFloatingActionButtonState createState() => _MyFloatingActionButtonState();
 }
