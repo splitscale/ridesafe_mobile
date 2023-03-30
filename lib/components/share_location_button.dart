@@ -43,6 +43,6 @@ class ShareLiveLocationButton extends ConsumerWidget {
           );
         },
         child: const Text('Share Live Location',
-            style: TextStyle(fontSize: 14.0)));
+            style: TextStyle(fontSize: 12.0)));
   }
 }

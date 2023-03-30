@@ -161,7 +161,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(255, 2, 56, 110),
           title: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
                 // width is less
@@ -170,7 +170,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
                   backgroundColor: Color.fromARGB(255, 48, 152, 255),
                 ),
                 child: const Text('Emergency Contacts',
-                    style: TextStyle(fontSize: 14.0)),
+                    style: TextStyle(fontSize: 12.0)),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -229,7 +229,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
           ),
         ),
         floatingActionButton: const MyFloatingActionButton(),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat);
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat);
   }
 }
 
