@@ -1,16 +1,20 @@
-# shca_test
+# RideSafe: Your smart helmet companion
 
-A new Flutter project.
+With the mobile application companion for RideSafe smart helmet, the driver will be able to connect to the smart helmet. In an event of emergency the app will detect the crash and will immediately notify nearby first responders.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Before you can run the app, make sure you have Flutter installed and set up on your machine. 
+You can follow the [Flutter installation guide](https://docs.flutter.dev/get-started/install) to do so.
 
-A few resources to get you started if this is your first Flutter project:
+Once Flutter is set up, follow these steps:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+1. Clone this repository: `git clone https://github.com/splitscale/ridesafe_mobile.git`
+2. Navigate to the project directory: `cd ridesafe_mobile`
+3. Get the dependencies: `flutter pub get`
+4. Connect an Android phone with min API level 30 to your computer
+5. Run the app: `flutter run`
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Download
+
+You can download the compiled APK file for Android from [release page](https://github.com/splitscale/ridesafe_mobile/releases/tag/v1.0.52)
