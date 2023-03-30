@@ -1,19 +1,12 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shca_test/screens/map_screen.dart';
 import 'package:shca_test/components/add_user_button.dart';
-import 'package:ridesafe_api/ridesafe_api.dart';
 
 import 'package:shca_test/providers/username_provider.dart';
 import 'package:shca_test/providers/json_provider.dart';
 
 class UsernameScreen extends ConsumerWidget {
-  final Ridesafe ridesafe;
-  const UsernameScreen({Key? key, required this.ridesafe}) : super(key: key);
+  const UsernameScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,7 +24,7 @@ class UsernameScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Card(
-              color: Color.fromARGB(100, 95, 148, 200),
+              color: const Color.fromARGB(100, 95, 148, 200),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
                 // side: BorderSide(
@@ -136,7 +129,6 @@ class UsernameScreen extends ConsumerWidget {
             AddUser(
               username: ref.watch(userDetailsProvider).username,
               userType: ref.watch(userDetailsProvider).userType,
-              ridesafe: ridesafe,
             ),
           ],
         ),

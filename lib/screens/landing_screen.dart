@@ -1,10 +1,8 @@
 import 'package:shca_test/screens/username_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:ridesafe_api/ridesafe_api.dart';
 
 class RideSafeLandingScreen extends StatelessWidget {
-  final Ridesafe ridesafe;
-  const RideSafeLandingScreen({super.key, required this.ridesafe});
+  const RideSafeLandingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +37,7 @@ class RideSafeLandingScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 10.0),
+              const SizedBox(height: 10.0),
               const Text(
                 'Your Smart Helmet Companion',
                 style: TextStyle(
@@ -47,7 +45,7 @@ class RideSafeLandingScreen extends StatelessWidget {
                   fontSize: 20.0,
                 ),
               ),
-              SizedBox(height: 50.0),
+              const SizedBox(height: 50.0),
               MaterialButton(
                 onPressed: () {},
                 color: Colors.white,
@@ -62,9 +60,7 @@ class RideSafeLandingScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => UsernameScreen(
-                          ridesafe: ridesafe,
-                        ),
+                        builder: (context) => UsernameScreen(),
                       ),
                     );
                   },

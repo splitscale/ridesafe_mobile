@@ -1,34 +1,27 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shca_test/providers/json_provider.dart';
+import 'package:ridesafe_api/ridesafe.dart';
 import 'package:shca_test/providers/username_provider.dart';
 import 'package:shca_test/screens/family_share_screen.dart';
 import 'package:shca_test/screens/map_screen.dart';
 import 'package:crypto/crypto.dart';
-import 'package:ridesafe_api/ridesafe_api.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:ridesafe_api/ridesafe_api.dart';
 import 'package:shca_test/ridesafe_bluetooth/bluetooth_actions_handler.dart';
 import 'package:shca_test/ridesafe_bluetooth/bluetooth_scanning_handler.dart';
-import 'package:shca_test/widgets/stream_text.dart';
 import 'package:shca_test/utils/bluetooth_parser.dart';
 import 'package:shca_test/providers/bluetooth_provider.dart';
 
 class AddUser extends ConsumerStatefulWidget {
   final String username;
   final UserType userType;
-  final Ridesafe ridesafe;
 
-  AddUser(
-      {Key? key,
-      required this.username,
-      required this.userType,
-      required this.ridesafe})
+  const AddUser({Key? key, required this.username, required this.userType})
       : super(key: key);
 
   @override
@@ -63,7 +56,7 @@ class _AddUserState extends ConsumerState<AddUser> {
   @override
   void initState() {
     super.initState();
-    _service = BluetoothScanningHandler(widget.ridesafe);
+    _service = BluetoothScanningHandler(Ridesafe.controller);
     ref.read(bluetoothDataProvider);
   }
 
@@ -99,10 +92,9 @@ class _AddUserState extends ConsumerState<AddUser> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        child: const Text('Connect'),
         style: ElevatedButton.styleFrom(
-          primary: const Color(0xFF0270B8),
-          onPrimary: Colors.white,
+          foregroundColor: Colors.white,
+          backgroundColor: const Color(0xFF0270B8),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -141,6 +133,7 @@ class _AddUserState extends ConsumerState<AddUser> {
                           ? const MapScreen()
                           : const FamilyOptionScreen()));
         },
+        child: const Text('Connect'),
       ),
     );
   }

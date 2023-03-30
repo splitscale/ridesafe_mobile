@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:geolocator/geolocator.dart';
+import 'package:ridesafe_engine/rsicx.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'package:shca_test/detector/rsicx.dart';
 
 void debugRsicx() {
   final distanceTrigger = Rsicx.detector.distanceTrigger;

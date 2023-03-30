@@ -3,7 +3,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:ridesafe_api/ridesafe_api.dart';
+import 'package:ridesafe_api/ridesafe.dart';
 import 'package:shca_test/ridesafe_bluetooth/bluetooth_actions_handler.dart';
 import 'package:shca_test/ridesafe_bluetooth/bluetooth_scanning_handler.dart';
 import 'package:shca_test/widgets/stream_text.dart';
@@ -11,9 +11,7 @@ import 'package:shca_test/widgets/stream_text.dart';
 import '../../stream/console/console.dart';
 
 class TerminalScreen extends StatefulWidget {
-  final Ridesafe ridesafe;
-
-  const TerminalScreen({Key? key, required this.ridesafe}) : super(key: key);
+  const TerminalScreen({super.key});
 
   @override
   _TerminalScreenState createState() => _TerminalScreenState();
@@ -65,7 +63,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
   @override
   void initState() {
     super.initState();
-    _service = BluetoothScanningHandler(widget.ridesafe);
+    _service = BluetoothScanningHandler(Ridesafe.controller);
 
     _logStream = Console.logStream;
   }

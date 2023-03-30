@@ -1,29 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:ridesafe_api/api_endpoints.dart';
-import 'package:ridesafe_api/ridesafe_api.dart';
-import 'package:shca_test/screens/terminal/terminal_screen.dart';
+import 'package:ridesafe_api/ridesafe.dart';
+import 'package:ridesafe_engine/rsicx.dart';
 import 'package:shca_test/screens/landing_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shca_test/models/contacts_model.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'detector/rsicx.dart';
 import 'firebase_options.dart';
 
-import 'dependencies/flutter_dependency_initializer.dart';
-
 void main() async {
-  final dependencyInitializer = FlutterDependencyInitializer<Ridesafe>(
-    [
-      () async => ApiEndpoints(),
-    ],
-    () async => Ridesafe(ApiEndpoints()),
-  );
+  WidgetsFlutterBinding.ensureInitialized();
 
-  final Ridesafe ridesafe = await dependencyInitializer.initialize();
+  // init api
+  await Ridesafe.initialize();
 
   // init detector engine
-  await Rsicx.initialize();
+  await Rsicx.initialize(triggerDistance: 20, shockThreshold: 30);
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -32,18 +24,11 @@ void main() async {
   Hive.registerAdapter(ContactAdapter());
   await Hive.openBox<Contact>('contacts');
 
-  runApp(ProviderScope(
-      child: MyApp(
-    ridesafe: ridesafe,
-  )));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
-  final Ridesafe _ridesafe;
-
-  const MyApp({Key? key, required Ridesafe ridesafe})
-      : _ridesafe = ridesafe,
-        super(key: key);
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -55,7 +40,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       // home: TerminalScreen(ridesafe: _ridesafe),
-      home: RideSafeLandingScreen(ridesafe: _ridesafe),
+      home: const RideSafeLandingScreen(),
     );
   }
 }
