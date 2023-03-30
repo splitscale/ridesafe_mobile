@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shca_test/screens/map_screen.dart';
 import 'package:shca_test/components/add_user_button.dart';
+import 'package:ridesafe_api/ridesafe_api.dart';
 
 import 'package:shca_test/providers/username_provider.dart';
 import 'package:shca_test/providers/json_provider.dart';
 
 class UsernameScreen extends ConsumerWidget {
-  const UsernameScreen({Key? key}) : super(key: key);
+  final Ridesafe ridesafe;
+  const UsernameScreen({Key? key, required this.ridesafe}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -132,8 +134,10 @@ class UsernameScreen extends ConsumerWidget {
               ),
             ),
             AddUser(
-                username: ref.watch(userDetailsProvider).username,
-                userType: ref.watch(userDetailsProvider).userType),
+              username: ref.watch(userDetailsProvider).username,
+              userType: ref.watch(userDetailsProvider).userType,
+              ridesafe: ridesafe,
+            ),
           ],
         ),
       ),

@@ -1,8 +1,10 @@
 import 'package:shca_test/screens/username_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:ridesafe_api/ridesafe_api.dart';
 
 class RideSafeLandingScreen extends StatelessWidget {
-  const RideSafeLandingScreen({super.key});
+  final Ridesafe ridesafe;
+  const RideSafeLandingScreen({super.key, required this.ridesafe});
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +62,9 @@ class RideSafeLandingScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const UsernameScreen(),
+                        builder: (context) => UsernameScreen(
+                          ridesafe: ridesafe,
+                        ),
                       ),
                     );
                   },

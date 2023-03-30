@@ -55,6 +55,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
 
       setState(() {
         _isConnected = _checkConnection();
+        _actionsHandler.startListening();
       });
     } catch (e) {
       Console.error(e.toString());

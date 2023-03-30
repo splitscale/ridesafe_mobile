@@ -11,13 +11,16 @@ import 'package:shca_test/models/contacts_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shca_test/providers/json_provider.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shca_test/utils/bluetooth_parser.dart';
 
 import '../detector/rsicx_debug.dart';
 
 class DetailCards extends ConsumerWidget {
   final String title;
+  final String value;
 
-  const DetailCards({Key? key, required this.title}) : super(key: key);
+  const DetailCards({Key? key, required this.title, required this.value})
+      : super(key: key);
 
   IconData _getIconForTitle(String title) {
     switch (title) {
@@ -35,16 +38,7 @@ class DetailCards extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var mockData = ref.watch(mockDataProvider);
-    String value = '10';
     var icon = _getIconForTitle(title);
-    if (title == 'Alcohol Level') {
-      value = '87';
-    } else if (title == 'Ignition Status') {
-      value = 'On';
-    } else if (title == 'Helmet Status') {
-      value = 'Worn';
-    }
-
     // Alcoho Level, Ignition, Helmet, IoT
     // try {
     //   if (title == 'Alcohol Level') {
@@ -114,7 +108,8 @@ class DetailCards extends ConsumerWidget {
 }
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({Key? key}) : super(key: key);
+  final JsonParser bluetoothData;
+  const MapScreen({Key? key, required this.bluetoothData}) : super(key: key);
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -175,6 +170,10 @@ class _MapScreenState extends State<MapScreen>
   Widget build(BuildContext context) {
     bool inMotion = _speed >= 2.0;
     bool showAnimation = _speed >= 5.0;
+    String alcoholLevel = widget.bluetoothData.a.toString();
+    int helmetValue = widget.bluetoothData.b;
+    String helmetStatus = helmetValue == 0 ? 'Worn' : 'Not Worn';
+    String ignitionStatus = helmetValue == 0 ? 'On' : 'Off';
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 2, 56, 110),
@@ -237,10 +236,10 @@ class _MapScreenState extends State<MapScreen>
             const SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const [
-                DetailCards(title: 'Alcohol Level'),
-                DetailCards(title: 'Ignition Status'),
-                DetailCards(title: 'Helmet Status'),
+              children: [
+                DetailCards(title: 'Alcohol Level', value: alcoholLevel),
+                DetailCards(title: 'Ignition Status', value: ignitionStatus),
+                DetailCards(title: 'Helmet Status', value: helmetStatus),
               ],
             ),
           ],

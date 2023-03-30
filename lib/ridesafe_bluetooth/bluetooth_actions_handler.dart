@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:ridesafe_api/api_endpoints.dart';
 import 'package:ridesafe_api/device/connected_device_service_controller.dart';
 import 'package:ridesafe_core/connected_device/connected_device.dart';
@@ -9,11 +10,13 @@ class BluetoothActionsHandler {
   BluetoothActionsHandler(ConnectedDeviceServiceController controller)
       : _controller = controller;
 
-  void startListening(ConnectedDevice<BluetoothConnection> connectedDevice) {
+  Stream<String> startListening() {
     final stream = _controller.startListening();
 
-    stream.listen((event) {
+    return stream.map((event) {
+      debugPrint(event);
       Console.log(event);
+      return event.toString();
     });
   }
 

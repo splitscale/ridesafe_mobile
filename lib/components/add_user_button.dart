@@ -10,19 +10,118 @@ import 'package:shca_test/providers/username_provider.dart';
 import 'package:shca_test/screens/family_share_screen.dart';
 import 'package:shca_test/screens/map_screen.dart';
 import 'package:crypto/crypto.dart';
+import 'package:ridesafe_api/ridesafe_api.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:ridesafe_api/ridesafe_api.dart';
+import 'package:shca_test/ridesafe_bluetooth/bluetooth_actions_handler.dart';
+import 'package:shca_test/ridesafe_bluetooth/bluetooth_scanning_handler.dart';
+import 'package:shca_test/widgets/stream_text.dart';
+import 'package:shca_test/utils/bluetooth_parser.dart';
 
-class AddUser extends ConsumerWidget {
+class AddUser extends StatefulWidget {
   final String username;
   final UserType userType;
+  final Ridesafe ridesafe;
 
-  const AddUser({Key? key, required this.username, required this.userType})
+  AddUser(
+      {Key? key,
+      required this.username,
+      required this.userType,
+      required this.ridesafe})
       : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
+  _AddUserState createState() => _AddUserState();
+}
 
+class _AddUserState extends State<AddUser> {
+  late BluetoothScanningHandler _service;
+  late BluetoothActionsHandler _actionsHandler;
+
+  final TextEditingController _textEditingController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
+  JsonParser bluetoothData = JsonParser('{"a": 654, "b":0}');
+  late final Stream<String> _logStream;
+
+  bool _isConnected = false;
+
+  void _handleTextFieldSubmit(String str) {
+    setState(() {
+      _textEditingController.clear();
+      _actionsHandler.send(_textEditingController.text);
+    });
+  }
+
+  bool _checkConnection() {
+    return _actionsHandler.isConnected;
+  }
+
+  void _handleConnection() async {
+    try {
+      final connectedDeviceController = await _service.scanAndConnect();
+
+      _actionsHandler = BluetoothActionsHandler(connectedDeviceController);
+
+      setState(() {
+        _isConnected = _checkConnection();
+      });
+
+      _actionsHandler.startListening().listen((event) {
+        setState(() {
+          bluetoothData = JsonParser(event);
+          debugPrint(bluetoothData.toString());
+        });
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _service = BluetoothScanningHandler(widget.ridesafe);
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    _actionsHandler.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // debugPrint the bluetooth data to the console
+    return AddUserConsumer(
+      username: widget.username,
+      userType: widget.userType,
+      ridesafe: widget.ridesafe,
+      addBluetoothData: _handleConnection,
+      bluetoothData: bluetoothData,
+    );
+  }
+}
+
+class AddUserConsumer extends ConsumerWidget {
+  final String username;
+  final UserType userType;
+  final Ridesafe ridesafe;
+  final JsonParser bluetoothData;
+  void Function() addBluetoothData;
+  AddUserConsumer({
+    Key? key,
+    required this.username,
+    required this.userType,
+    required this.ridesafe,
+    required this.addBluetoothData,
+    required this.bluetoothData,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final users = FirebaseFirestore.instance.collection('users');
     Future<void> addUser() async {
       Position position = await Geolocator.getCurrentPosition();
       double latitude = position.latitude;
@@ -36,8 +135,8 @@ class AddUser extends ConsumerWidget {
             'latitude': latitude,
             'longitude': longitude,
           })
-          .then((value) => print("User Added"))
-          .catchError((error) => print("Failed to add user: $error"));
+          .then((value) => debugPrint("User Added"))
+          .catchError((error) => debugPrint("Failed to add user: $error"));
     }
 
     return SizedBox(
@@ -56,55 +155,16 @@ class AddUser extends ConsumerWidget {
           ref.read(userDetailsProvider.notifier).state = UserDetails(
               username: ref.watch(userDetailsProvider).username,
               userType: ref.watch(userDetailsProvider).userType);
+          addBluetoothData();
           addUser();
-          // Timer.periodic(const Duration(seconds: 1), (timer) {
-          //   var data = {
-          //     "gps": {
-          //       "latitude": 34.2342 + Random().nextInt(10),
-          //       "longitude": 23.893345 + Random().nextInt(10),
-          //       "speed": 25 + Random().nextInt(10),
-          //       "time": {
-          //         "hour": 1,
-          //         "minute": 1,
-          //         "second": 1 + Random().nextInt(10),
-          //       },
-          //       "date": {
-          //         "month": 1,
-          //         "day": 1 + Random().nextInt(10),
-          //         "year": 2023,
-          //       },
-          //     },
-          //     "helmet": {
-          //       "is_worn": Random().nextInt(10) % 2 == 0,
-          //       "alcohol_level": 256 - Random().nextInt(10),
-          //     },
-          //     "motor": {
-          //       "is_ignition_ready": Random().nextInt(10) % 2 == 0,
-          //     },
-          //     "debug": {
-          //       "message": "debug messages",
-          //       "source": "from receiver",
-          //       "info": "info here",
-          //     },
-          //   };
-          //   ref.read(mockDataProvider.notifier).state = data;
-          //   var latitude =
-          //       ref.watch(mockDataProvider)['gps']['latitude'] as double;
-          //   var longitude =
-          //       ref.watch(mockDataProvider)['gps']['longitude'] as double;
-          //   // add code here to update the location of the user in the database every 10 seconds
-          //   // users.doc(username).update({
-          //   //   'latitude': latitude,
-          //   //   'longitude': longitude,
-          //   //   'timestamp': DateTime.now().toString(),
-          //   // });
-          // });
+          // ignore: use_build_context_synchronously
           Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) =>
-                      ref.watch(userDetailsProvider).userType == UserType.driver
-                          ? const MapScreen()
+                      ref.watch(userDetailsProvider.notifier).state.userType ==
+                              UserType.driver
+                          ? MapScreen(bluetoothData: bluetoothData)
                           : const FamilyOptionScreen()));
         },
       ),
